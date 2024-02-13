@@ -1,14 +1,19 @@
 const express = require('express');
 const sequelize = require('./util/database');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 require('dotenv').config();
 
-const app = express();
+const userRoutes = require('./routes/user');
 
+const app = express();
+app.use(cors({
+    origin: '*',
+    methods:['GET','POST'],
+  
+  }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
-
-const userRoutes = require('./routes/user');
 
 app.use('/home',(req,res) => {
     res.sendFile('signup.html',{root:'views'});

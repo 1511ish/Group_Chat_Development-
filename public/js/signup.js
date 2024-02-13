@@ -28,9 +28,6 @@ async function signup(e) {
     } catch (err) {
         form_container.innerHTML += `<div style='color:red ;margin:5px'>${err.response.data.message} <div>`;
     }
-
-    name.value = '';
-    email.value = '';
-    phone_no.value = '';
-    password.value = '';
+    
+    form.reset();
 }
