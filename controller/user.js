@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 exports.signUp = async (req, res) => {
     try {
@@ -16,7 +18,7 @@ exports.signUp = async (req, res) => {
                 res.status(201).json({ message: 'Successfully created new user' });
                 console.log('SUCCESSFULLY ADDED');
             } catch (error) {
-                res.status(400).json({ message: 'there is already account on this email or phone number!'});
+                res.status(400).json({ message: 'there is already account on this email or phone number!' });
             }
         });
     } catch (error) {
@@ -49,3 +51,34 @@ exports.signUp = async (req, res) => {
 //         console.log(error);
 //     }
 // }
+
+exports.getLoginPage = async (req, res) => {
+    res.sendFile('login.html', { root: 'views' });
+}
+
+exports.login = async (request, response) => {
+    try {
+        const { email, password } = request.body;
+        let userExist = await User.findOne({ where: { email_Id: email } })
+        if (userExist) {
+            const isPasswordValid = await bcrypt.compare(password, userExist.password);
+            console.log(isPasswordValid);
+            if (isPasswordValid) {
+                const token = jwt.sign({ userId: userExist.id }, process.env.SECRET_KEY);
+                return response.status(201).json({ success: true, message: "User logged in successfully", token: token });
+            } else {
+                return response.status(401).json({ success: false, message: 'Invalid Password!' });
+            }
+        } else {
+            return response.status(404).json({ message: 'Account is not exist!' })
+        }
+
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+exports.getMainPage = async (req, res) => {
+    res.sendFile('main.html', { root: 'views' });
+}

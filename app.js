@@ -13,12 +13,14 @@ app.use(cors({
   
   }));
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.use('/home',(req,res) => {
     res.sendFile('signup.html',{root:'views'});
 })
 app.use('/user', userRoutes);
+
 app.get('/', (req, res) => {
     res.sendFile('notfound.html',{root:'views'});
 });

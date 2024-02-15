@@ -4,22 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/login.html">
+    <link rel="stylesheet" href="/css/login.css">
     <title>WhatsApp Login</title>
 </head>
 
 <body>
     <div id="container">
         <h2>WhatsApp Login</h2>
-        <form id="login_form" action="/login" method="POST">
+        <form id="login_form" action="#" method="#">
             <input type="email" name="email" placeholder="Email Id" id="login_email" required>
             <input type="password" name="password" placeholder="Password" id="login_password" required>
             <input type="submit" value="Log in" id="login_btn">
-            <input type="submit" value="Sign up" id="signup_btn">
-        </form>
-        <a href="#">Forgot Password?</a><br>
+            <a href="#">Forgotten Password</a><br>
+            <hr>
+            <input type="button" value="Sign up" id="signup_btn">
+        </form>    
     </div>
-
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 
 </html>

@@ -25,9 +25,10 @@ async function signup(e) {
         console.log('chal toh raha bhai..');
         const response = await axios.post('user/signup', user);
         alert("user signup successfully.");
+        window.location.href = "user/loginPage";
     } catch (err) {
         form_container.innerHTML += `<div style='color:red ;margin:5px'>${err.response.data.message} <div>`;
     }
-    
+
     form.reset();
 }

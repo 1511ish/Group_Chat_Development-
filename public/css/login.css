@@ -43,9 +43,14 @@ input[type="submit"] {
 }
 
 #signup_btn {
+    width: 100%;
+    padding: 10px;
     background-color: #25d366;
     color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 15px;
     transition: background-color 0.3s ease;
 }
 
@@ -59,4 +64,10 @@ input[type="submit"]:hover {
 a {
     text-decoration: none;
     color: #1e88e5;
+}
+hr{
+    height: 1px;
+    margin: 15px 0;
+    background-color: #ccc;
+    border: none;
 }
