@@ -1,0 +1,62 @@
+body h1 {
+    text-align: center;
+}
+
+.container {
+    background: rgb(240, 229, 229);
+    height: 98vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#message_type_container {
+    display: flex;
+    height: 6%;
+    /* background: red; */
+    width: 70vw;
+    align-items: center;
+    justify-content: center;
+}
+
+#message_type_container div {
+    background-color: #25d366;
+    border-radius: 10px;
+}
+
+#message_type_container div i {
+    padding: 8px;
+}
+
+#message_type_container div:hover {
+    cursor: pointer;
+    /* border: 1px solid #ccc; */
+}
+
+#message_field {
+    width: 90%;
+    border-radius: 10px;
+    height: 100%;
+    border: 1px solid #ccc;
+    font-size: 120%;
+}
+
+.fa-paper-plane {
+    font-size: 180%;
+}
+
+#message_container {
+    width: 50%;
+    padding: 1%;
+}
+
+ul li {
+    list-style: none;
+    font-size: 120%;
+    background: #25d366;
+    border-radius: 5px;
+    padding: 0.5%;
+    color: #fff;
+    display: inline-block;
+}

@@ -1,6 +1,8 @@
 const User = require('../models/User');
+// const DB = require('../util/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const fs = require('fs')
 require('dotenv').config();
 
 exports.signUp = async (req, res) => {
@@ -65,7 +67,9 @@ exports.login = async (request, response) => {
             console.log(isPasswordValid);
             if (isPasswordValid) {
                 const token = jwt.sign({ userId: userExist.id }, process.env.SECRET_KEY);
-                return response.status(201).json({ success: true, message: "User logged in successfully", token: token });
+                // DB.online_arr.push(userExist.name);
+                // console.log(DB.online_arr);
+                return response.status(201).json({ success: true, message: `${userExist.name} logged in successfully`, token: token });
             } else {
                 return response.status(401).json({ success: false, message: 'Invalid Password!' });
             }
