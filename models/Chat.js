@@ -11,7 +11,18 @@ const Chat = sequelize.define('chat', {
     message: {
         type: Sequelize.TEXT(),
         allowNull: false
-    }
-});
+    },
+    isImage: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
+    date_time: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+},
+    {
+        timestamps: false
+    });
 
 module.exports = Chat;

@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken');
 
 const User = require('./models/User');
 const Chat = require('./models/Chat');
+const Groups = require("./models/groups");
+const GroupMember = require('./models/Group-members');
 
 const userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chat');
@@ -32,6 +34,11 @@ app.get('/', (req, res) => {
 
 User.hasMany(Chat)
 Chat.belongsTo(User);
+Groups.hasMany(Chat, { constraints: true, onDelete: 'CASCADE' });
+Chat.belongsTo(Groups);
+User.belongsToMany(Groups, { through: GroupMember });
+Groups.belongsToMany(User, { through: GroupMember ,onDelete: 'CASCADE'});
+Groups.belongsTo(User, { foreignKey: 'AdminId', constraints: true, onDelete: 'CASCADE' })
 
 const PORT = process.env.PORT
 async function initiate() {

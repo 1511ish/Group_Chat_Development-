@@ -1,14 +1,18 @@
 const jwt = require('jsonwebtoken');
 const Chat = require('../models/Chat');
 
+// this is working fine..
 exports.addChat = (req, res) => {
-    const { message, token } = req.body;
+    const { message, token, groupId } = req.body;
+    console.log(groupId);
     const obj = jwt.verify(token, 'secretKey');
+    console.log(obj);
     const userId = obj.userId;
-    const promise = Chat.create({ message: message, userId: userId });
+    const name = obj.name;
+    const promise = Chat.create({ message: message, userId: userId, GroupId: groupId });
     promise.then(response => {
-        console.log(response.message);
-        return res.status(201).json({ message: response.message });
+        console.log(response);
+        return res.status(201).json({ message: response.message, name: name, date_time: response.date_time });
     }).catch(err => {
         console.log(err);
     })
