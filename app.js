@@ -1,9 +1,13 @@
+// const { createServer } = require("http");
+const http = require("http");
+const { Server } = require("socket.io");
 const express = require('express');
 const sequelize = require('./util/database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const upload = multer();
+require('dotenv').config();
 
 const User = require('./models/User');
 const Chat = require('./models/Chat');
@@ -16,6 +20,15 @@ const chatRoutes = require('./routes/chat');
 const Awsservice = require('./services/awsservice');
 
 const app = express();
+
+const io = new Server(server);
+io.on('connection', (socket) => {
+    console.log("a new user has connected", socket.id);
+    socket.on('new-group-message', (groupId) => {
+        socket.broadcast.emit('group-message', groupId);
+    })
+})
+
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST'],
@@ -43,7 +56,10 @@ app.post('/upload', upload.single('media'), async (req, res) => {
 });
 app.get('/', (req, res) => {
     res.sendFile('notfound.html', { root: 'views' });
+    // res.sendFile('demo.html', { root: 'views' });
 });
+
+const server = http.createServer(app);
 
 User.hasMany(Chat)
 Chat.belongsTo(User);
@@ -57,7 +73,7 @@ const PORT = process.env.PORT
 async function initiate() {
     try {
         await sequelize.sync()
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log(`Server running on port ${PORT}...`)
         })
     } catch (error) {

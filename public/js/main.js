@@ -1,4 +1,5 @@
-// require('dotenv').config();
+const socket = io();
+
 const create_newgroup_btn = document.getElementById('create_newgroup_btn');
 const group_container = document.getElementById('group_container');
 const token = localStorage.getItem('token');
@@ -622,4 +623,21 @@ messageForm.addEventListener('submit', async function (event) {
             });
     }
 
+
+    socket.emit('new-group-message', groupId)
+    // showGroupChats(groupId)
+
 });
+
+
+socket.on('group-message', async (groupId_P) => {
+    if (groupId == groupId_P) {
+        showGroupChats(groupId);
+    }
+    else{
+        const APIresponse = await axios(`/user/get-group?groupId=${groupId_P}`);
+        const { group } = APIresponse.data;
+        group_heading.innerHTML = ``;
+        alert(`there is some imcoming messages from ${group.name} group.`);
+    }
+})
