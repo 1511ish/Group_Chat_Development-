@@ -10,12 +10,18 @@ const Group = sequelize.define('Groups', {
     },
     name:{
         type:Sequelize.STRING(50),
-      unique:true,
-      notEmpty:true,
+        unique:true,
+        notEmpty:true,
+    },
+    description:{
+        type:Sequelize.STRING
     },
     membersNo:{
         type:Sequelize.INTEGER,
         allowNull:false       
+    },
+    dp_url:{
+        type:Sequelize.STRING
     },
     date:{
         type:Sequelize.DATE,

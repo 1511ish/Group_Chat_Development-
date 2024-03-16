@@ -9,7 +9,7 @@ exports.authenticate = (req, res, next) => {
         User.findByPk(obj.userId).then(user => {
             req.user = user;
             // console.log(user);
-            // req.userId = user.id;
+            req.userId = user.id;
             next();
         }).catch(err => { throw new Error(err) });
     } catch (err) {

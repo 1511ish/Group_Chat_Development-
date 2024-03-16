@@ -4,19 +4,21 @@ const group_container = document.getElementById('group_container');
 const token = localStorage.getItem('token');
 ShowGroup();
 const group_editbtn = document.getElementById('three_dotes')
-const send_btn = message_form.querySelector('div');
+const send_btn = message_form.querySelector('.send_btn');
 
 var dots = document.querySelector(".dots");
 var optionsMenu = document.querySelector(".options_menu");
 var removeUserForm = document.querySelector("#remove_user_form");
 var addUserForm = document.querySelector("#add_user_form");
+var groupId;
 
 function afterSetUp(groupId) {
     console.log("in afterSetUp method.");
     let html = `<ul>
-                   <li><a href="#" class="option_edit">Group Profile Edit</a></li>
-                   <li><a href="#" class="option_add" id="${groupId}" onclick='addUserform(${groupId})'>Add User</a></li>
-                   <li><a href="#" class="option_remove" id="${groupId}" onclick='removeUserform(${groupId})'>Remove User</a></li>
+                   <li><a href="#" class="" onclick='viewGroupProfile(${groupId})'>View Group Profile</a></li>
+                   <li><a href="#" class="option_editProfile" onclick='groupProfileEditform(${groupId})'>Edit Group Profile</a></li>
+                   <li><a href="#" class="option_add" onclick='addUserform(${groupId})'>Add User</a></li>
+                   <li><a href="#" class="option_remove"  onclick='removeUserform(${groupId})'>Remove User</a></li>
                    <li><a href="#" onclick='deleteGroup(${groupId})'>Delete Group</a></li>
                 </ul>`;
     optionsMenu.innerHTML = html;
@@ -45,12 +47,15 @@ function displayMenu() {
 }
 
 async function addUserform(groupId) {
-    console.log("clicked");
     addUserForm.style.visibility = 'visible';
     const userSearchInput = document.getElementById('adduserSearch');
     const userList = document.getElementById('adduserList');
 
-    const response = await axios.get('http://localhost:3000/user/getAll', { headers: { 'Authorization': token } });
+    const memberApi = await axios(`get-group-members?groupId=${groupId}`, { headers: { 'Authorization': token } });
+    const { userIds } = memberApi.data;
+    console.log(userIds);
+
+    const response = await axios.get('http://localhost:3000/user/getAllUserExcept', { headers: { 'Authorization': token, userIds: JSON.stringify(userIds) } });
     const users = response.data.users
 
     // Initialize checked state for each user
@@ -99,10 +104,11 @@ async function addUserform(groupId) {
             userCheckedState[user] = false;
         });
         groupForm.reset();
-        const response = await axios.post(`http://localhost:3000/user/update-group/add-user?groupId=${groupId}`,{usersToAddIds: selectedUsers}, { headers: { 'Authorization': token } });
+        const response = await axios.post(`http://localhost:3000/user/update-group/add-user?groupId=${groupId}`, { usersToAddIds: selectedUsers }, { headers: { 'Authorization': token } });
         alert(response.data.message);
+        addUserForm.style.visibility = 'hidden';
         // Re-render user list with all users unchecked
-        renderUserList(users);
+        // renderUserList(users);
     });
     const cancel_btn = document.getElementById('add_cancel_btn');
     cancel_btn.addEventListener('click', (e) => {
@@ -167,7 +173,6 @@ async function removeUserform(groupId) {
     removeUserForm.addEventListener('submit', removeUser);
     async function removeUser(e) {
         e.preventDefault();
-        console.log("atleast chal toh araha hai...");
         const selectedUsers = Object.keys(userCheckedState).filter(user => userCheckedState[user]);
 
         console.log(selectedUsers.length);
@@ -176,6 +181,92 @@ async function removeUserform(groupId) {
         const response = await axios.post(`http://localhost:3000/user/update-group/remove-user?groupId=${groupId}`, { usersToRemoveIds: selectedUsers }, { headers: { 'Authorization': token } });
         alert(response.data.message);
     }
+}
+
+async function groupProfileEditform(groupId) {
+    var groupProfileEditForm = document.querySelector("#group_profile_edit_Form");
+    groupProfileEditForm.style.visibility = 'visible';
+    const preview3 = document.getElementById('preview3');
+    const groupName = document.getElementById('groupEditName');
+    const description = document.getElementById('edit_description');
+
+    const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+    const { group } = APIresponse.data;
+    preview3.src = group.dp_url;
+    groupName.value = `${group.name}`;
+    description.value = `${group.description}`;
+
+
+    groupProfileEditForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fileInput = document.querySelector('input[name="avatar-upload3"]');
+        const file = fileInput.files[0];
+
+        if(file){
+            const formData = new FormData();
+            formData.append('media', file);
+            axios.post('/upload', formData)
+                .then(response => {
+                    const data = {
+                        name: groupName.value,
+                        description: description.value,
+                        dp_url: response.data,
+                        groupId: groupId
+                    }
+                    console.log(data);
+                    axios.post('http://localhost:3000/user/update-group', data, { headers: { 'Authorization': token } });
+                })
+                .then(res => {
+                    alert("Group successfully updated.");
+                    groupName.value = '';
+                    description.value = '';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        else{
+            const data = {
+                name: groupName.value,
+                description: description.value,
+                dp_url: group.dp_url,
+                groupId: groupId
+            }
+            axios.post('http://localhost:3000/user/update-group', data, { headers: { 'Authorization': token } })
+            .then(res => {
+                console.log("working..")
+                alert("Group successfully updated.");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+            groupName.value = '';
+            description.value = '';
+        }
+    })
+
+}
+
+const view_groupProfile_form = document.querySelector("#view_groupProfile_form");
+const VGP_groupname = document.getElementById('VGP_groupname');
+const VGP_description = document.getElementById('VGP_description');
+const preview2 = document.getElementById('preview2');
+async function viewGroupProfile2() {
+    view_groupProfile_form.style.visibility = 'visible';
+    const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+    const { group } = APIresponse.data;
+    preview2.src = group.dp_url;
+    VGP_groupname.innerHTML = `${group.name}`;
+    VGP_description.innerHTML = ` ${group.description}`;
+}
+
+async function viewGroupProfile(groupId) {
+    view_groupProfile_form.style.visibility = 'visible';
+    const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+    const { group } = APIresponse.data;
+    preview2.src = group.dp_url;
+    VGP_groupname.innerHTML = `${group.name}`;
+    VGP_description.innerHTML = ` ${group.description}`;
 }
 
 async function deleteGroup(groupId) {
@@ -211,7 +302,7 @@ create_newgroup_btn.addEventListener('click', async (e) => {
             const div = document.createElement('div');
             const isChecked = userCheckedState[user.id];
             div.innerHTML = `<div>
-                               <label for="${user.id}"><img src="/dp.PNG" alt="" class="avatar">${user.name}</label>
+                               <label for="${user.id}"><img src="/img/user.PNG" alt="" class="avatar">${user.name}</label>
                             </div>
                             <input type="checkbox" id="${user.id}" name="users" value="${user.id}" ${isChecked ? 'checked' : ''}>`;
             userList.appendChild(div);
@@ -239,45 +330,54 @@ create_newgroup_btn.addEventListener('click', async (e) => {
 
     groupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        // Collect form data
+        console.log("groupForm submited.");
         const groupName = document.getElementById('groupName').value;
         const description = document.getElementById('description').value;
+        const fileInput = document.querySelector('input[name="profile"]');
         const selectedUsers = Object.keys(userCheckedState).filter(user => userCheckedState[user]);
-        console.log(token)
-
-        const data = {
-            name: groupName,
-            membersNo: selectedUsers.length + 1,
-            membersIds: selectedUsers
-        }
-
-        // Here you can perform AJAX request to the server to handle group creation
-        console.log('Group Name:', groupName);
-        console.log('Description:', description);
-        console.log('Selected Users:', selectedUsers);
 
         // Reset checked state of all users
         Object.keys(userCheckedState).forEach(user => {
             userCheckedState[user] = false;
         });
-        groupForm.reset();
-        await axios.post('http://localhost:3000/user/create-group', data, { headers: { 'Authorization': token } });
-        alert("Group successfully created")
 
         // Re-render user list with all users unchecked
         renderUserList(users);
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('media', file);
+
+        axios.post('/upload', formData)
+            .then(response => {
+                const data = {
+                    name: groupName,
+                    membersNo: selectedUsers.length + 1,
+                    membersIds: selectedUsers,
+                    description: description,
+                    dp_url: response.data
+                }
+                axios.post('http://localhost:3000/user/create-group', data, { headers: { 'Authorization': token } });
+            })
+            .then(res => {
+                alert("Group successfully created");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     });
     cancel_btn.addEventListener('click', (e) => {
         e.preventDefault();
         groupForm.style.visibility = 'hidden';
     })
+
+    groupForm.reset();
 })
 
 async function ShowGroup() {
     try {
         const groupsResponse = await axios(`http://localhost:3000/user/get-mygroups`, { headers: { 'Authorization': token } });
         const { groups } = groupsResponse.data;
-        // console.log(groups);
         let html = "";
         groups.forEach((ele) => {
             const date = new Date(ele.date);
@@ -286,7 +386,7 @@ async function ShowGroup() {
             html += `               
             <li onclick="showGroupChat(${ele.id})">
                <div>
-                   <img src="https://picsum.photos/seed/${ele.id}/200" alt="Profile Picture">
+                   <img src="${ele.dp_url}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
                    <strong id="${ele.id}">${ele.name}</strong>
                    <small id="${ele.id}">${ele.membersNo} Members</small>
                </div>
@@ -302,11 +402,9 @@ async function ShowGroup() {
 async function showGroupChat(id) {
     try {
         // const groupId = e.target.id;
-        const groupId = id;
-
+        groupId = id;
         const getUserResponse = await axios.get('/user/get-user', { headers: { 'Authorization': token } });
         const userId = getUserResponse.data.userId
-        // console.log(userId);
         if (groupId && groupId != "group_body") {
             setupGroup(groupId, userId)
             if (groupId == 0) {
@@ -314,7 +412,6 @@ async function showGroupChat(id) {
             } else {
                 const APIresponse = await axios(`get-group-messages?groupId=${groupId}`);
                 const apiChats = APIresponse.data.chats
-                // console.log(APIresponse.data);
                 showChatOnScreen(apiChats, userId)
             }
         } else {
@@ -335,36 +432,25 @@ function showChatOnScreen(chatHistory, userId) {
         const date = new Date(ele.date_time);
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         const formattedDate = date.toLocaleString('en-US', options);
-
         if (ele.userId == userId) {
-            // if (ele.isImage) {
-            //     messageText += `      
-            // <div class="col-12 mb-2 pe-0">
-            //     <div class="card p-2 float-end rounded-4 self-chat-class">
-            //         <p class="text-primary my-0"><small>${ele.name}</small></p>
-            //         <a href="${ele.message}" target="_blank">
-            //           <img src="${ele.message}" class="chat-image">
-            //         </a>
-            //         <small class="text-muted text-end">${formattedDate}</small>
-            //     </div>
-            // </div>
-            // `
-            // } 
-            // else { }
-            // messageText += `                            
-            // <div class="col-12 mb-2 pe-0">
-            //     <div class="card p-2 float-end rounded-4 self-chat-class">
-            //         <p class="text-primary my-0"><small>${ele.name}</small></p>
-            //         <p class="my-0">${ele.message}</p>
-            //         <small class="text-muted text-end">${formattedDate}</small>
-            //     </div>
-            // </div>`
-            messageText += `                            
-            <div class="card outgoing">
-               <small class="text-primary">${ele.name}</small>
-               <p class="chat">${ele.message}</p>
-               <small class="text-muted text-end">${formattedDate}</small>
-           </div>`
+            if (ele.isImage) {
+                messageText += `<div class="card outgoing">
+                                   <small class="text-primary">${ele.name}</small>
+                                    <div>
+                                      <a href="${ele.message}" target="_blank">
+                                      <img src="${ele.message}" class="chat-image">
+                                    </a>
+                                    </div>
+                                   <small class="text-muted text-end">${formattedDate}</small>
+                                </div>`;
+            } else {
+                messageText += `                            
+                <div class="card outgoing">
+                   <small class="text-primary">${ele.name}</small>
+                   <p class="chat">${ele.message}</p>
+                   <small class="text-muted text-end">${formattedDate}</small>
+               </div>`
+            }
         } else {
             // if (ele.isImage) {
             //     messageText += `                            
@@ -377,7 +463,24 @@ function showChatOnScreen(chatHistory, userId) {
             //             <small class="text-muted">${formattedDate}</small>
             //         </div>
             //     </div>`
-
+            if (ele.isImage) {
+                messageText += `<div class="card incoming">
+                                   <small class="text-primary">${ele.name}</small>
+                                    <div>
+                                      <a href="${ele.message}" target="_blank">
+                                      <img src="${ele.message}" class="chat-image">
+                                    </a>
+                                    </div>
+                                   <small class="text-muted text-end">${formattedDate}</small>
+                                </div>`;
+            } else {
+                messageText += `                     
+                <div class="card incoming">
+                   <small class="text-danger">${ele.name}</small>
+                   <p class="chat">${ele.message}</p>
+                   <small class="text-muted text-end">${formattedDate}</small>
+                </div>`
+            }
             // } else { }
             // messageText += `                            
             // <div class="col-12 mb-2 pe-0">
@@ -387,12 +490,7 @@ function showChatOnScreen(chatHistory, userId) {
             //         <small class="text-muted">${formattedDate}</small>
             //     </div>
             // </div>`
-            messageText += `                     
-            <div class="card incoming">
-               <small class="text-danger">${ele.name}</small>
-               <p class="chat">${ele.message}</p>
-               <small class="text-muted text-end">${formattedDate}</small>
-            </div>`
+
         }
 
     })
@@ -402,6 +500,7 @@ function showChatOnScreen(chatHistory, userId) {
 
 async function setupGroup(groupId, userId) {
     try {
+        // groupId = GroupId;
         if (groupId == 0) {
             group_img.src = `https://picsum.photos/seed/common/200`;
             group_heading.innerHTML = `Common Group`;
@@ -411,20 +510,19 @@ async function setupGroup(groupId, userId) {
             group_editbtn.classList.add('d-none')
 
         } else {
-            // console.log("chalu hai bhai........");
             const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
             const { group } = APIresponse.data;
-            group_img.src = `https://picsum.photos/seed/${groupId}/200`;
+            group_img.src = group.dp_url;
             group_heading.innerHTML = `${group.name}`;
             group_members.innerHTML = ` ${group.membersNo} Members`;
             const memberApi = await axios(`get-group-members?groupId=${groupId}`, { headers: { 'Authorization': token } });
             const { users } = memberApi.data;
 
             const usersString = users.map(item => item.name.trim()).join(',');
-            group_members.setAttribute("title", `${usersString}`);
+            group_members.setAttribute("title", `You,${usersString}`);
+            // yaha pe issue hai bro...
             send_btn.id = groupId
             if (group.AdminId == userId) {
-                // group_editbtn.id = groupId;
                 group_editbtn.classList.remove('d-none')
                 afterSetUp(groupId);
             } else {
@@ -453,63 +551,105 @@ async function showGroupChats(groupId) {
 }
 
 
-
-
-
-
-
 const message = document.getElementById('message_field');
 const chat_body = document.getElementById('chat_body');
-send_btn.addEventListener('click', sendMessage);
 
-// let oldChat = []; ######yo pehle bhi commented tha...........
+const messageForm = document.getElementById('message_form');
+const fileInput = document.querySelector('input[name="media"]');
+const preview = document.getElementById('preview');
+const messageInput = document.querySelector('input[name="message"]');
 
-async function sendMessage(e) {
-    e.preventDefault();
-    const groupId = e.target.id;
-    console.log(message.value);
-    console.log(e.target);
-    console.log(groupId);
-    const data = {
-        token: localStorage.getItem('token'),
-        message: message.value,
-        groupId: groupId
+fileInput.addEventListener('change', function (event) {
+    const file = event.target.files[0]; // Get the selected file
+
+    // Check if a file is selected
+    if (file) {
+        const reader = new FileReader(); // Create a FileReader object
+
+        // Define what happens when the FileReader has loaded the file
+        reader.onload = function (event) {
+            const src = event.target.result; // Get the file's data URL
+
+            // Display the selected image or video in the preview container
+            preview.style.visibility = 'visible';
+            if (file.type.startsWith('image')) {
+                preview.innerHTML = `<img src="${src}" alt="Selected Image" style="min-width: 100%; min-height: 100%">`;
+            } else if (file.type.startsWith('video')) {
+                preview.innerHTML = `<video controls style="max-width: 300px; max-height: 300px;"><source src="${src}" type="${file.type}"></video>`;
+            }
+        };
+
+        // Read the selected file as a data URL
+        reader.readAsDataURL(file);
+    } else {
+        // Clear the preview container if no file is selected
+        preview.innerHTML = '';
     }
-    try {
-        // if (localStorage.getItem('oldChat')) { ######yo pehle bhi commented tha...........
-        //     oldChat = localStorage.getItem('oldChat');
-        // }
+});
+
+messageForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    // const messageInput = document.querySelector('input[name="message"]');
+    const message = messageInput.value.trim();
+    messageInput.value = '';
+    console.log(message);
+
+    // Get the selected media file
+    const file = fileInput.files[0];
+
+    // Create a new FormData object
+    const formData = new FormData();
+
+    if (message) {
+        const data = {
+            token: localStorage.getItem('token'),
+            message: message,
+            groupId: groupId,
+            isImage: false
+        }
         const response = await axios.post('http://localhost:3000/chat/add', data)
         const date = new Date(response.data.date_time);
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         const formattedDate = date.toLocaleString('en-US', options);
-        console.log(formattedDate);
+
         chat_body.innerHTML += ` <div class="card outgoing">
-                                    <small class="text-primary">${response.data.name}</small>
-                                    <p class="chat">${response.data.message}</p>
-                                    <small class="text-muted text-end">${formattedDate}</small>
-                                </div>`;
-
-        // oldChat.push({ id: response.data.id, message: response.data.message });
-        // localStorage.setItem('oldChat',oldChat);
-    } catch (err) {
-        console.log(err);
+                        <small class="text-primary">${response.data.name}</small>
+                        <p class="chat">${response.data.message}</p>
+                        <small class="text-muted text-end">${formattedDate}</small>
+                    </div>`;
     }
-    message.value = '';
-}
+    else {
+        formData.append('media', file);
+        axios.post('/upload', formData)
+            .then(async (res) => {
+                const data = {
+                    token: localStorage.getItem('token'),
+                    message: res.data,
+                    groupId: groupId,
+                    isImage: true
+                }
+                console.log(data);
+                const response = await axios.post('http://localhost:3000/chat/add', data)
+                const date = new Date(response.data.date_time);
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                const formattedDate = date.toLocaleString('en-US', options);
 
-// window.addEventListener('DOMContentLoaded', async () => {
-//     const token = localStorage.getItem('token');
-//     // if (localStorage.getItem('oldChat')) {
-//     //     oldChat = localStorage.getItem('oldChat');
-//     // }
-//     const response = await axios.get(`http://localhost:3000/chat/get`, { headers: { 'Authorization': token } });
-//     console.log(response);
-//     const chats = response.data.chats;
-//     chats.forEach(chat => {
-//         const li = document.createElement('li');
-//         li.innerHTML = chat.message;
-//         chat_ul.appendChild(li);
-//         chat_ul.innerHTML += `<br>`;
-//     });
-// })
+                chat_body.innerHTML += ` <div class="card outgoing">
+                                <small class="text-primary">${response.data.name}</small>
+                                <div>
+                                    <a href="${response.data.message}" target="_blank">
+                                    <img src=${response.data.message} alt="Selected Image" style="max-width: 300px; max-height: 300px;">
+                                </div>
+                                <small class="text-muted text-end">${formattedDate}</small>
+                            </div>`;
+
+                fileInput.value = '';
+                preview.innerHTML = '';                   
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+});

@@ -2,13 +2,11 @@ const User = require('../models/User');
 const Group = require('../models/groups');
 const Chat = require('../models/Chat');
 // const DB = require('../util/database');
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const fs = require('fs')
-require('dotenv').config();
 const { Op } = require('sequelize');
-const { request } = require('http');
-const { response } = require('express');
+require('dotenv').config();
 
 exports.signUp = async (req, res) => {
     try {
@@ -81,15 +79,13 @@ exports.login = async (request, response) => {
         } else {
             return response.status(404).json({ message: 'Account is not exist!' })
         }
-
-
     } catch (error) {
         console.log(error);
     }
 }
 
 exports.getMainPage = async (req, res) => {
-    res.sendFile('practice.html', { root: 'views' });
+    res.sendFile('main.html', { root: 'views' });
 }
 
 exports.getAllUser = async (req, res) => {
@@ -105,14 +101,30 @@ exports.getAllUser = async (req, res) => {
     return res.status(200).json({ success: true, users: users });
 }
 
+exports.getAllUserExcept = async (req, res) => {
+    const user = req.user;
+    let userIds = JSON.parse(req.header('userIds'));
+    userIds.push(user.id);
+    const users = await User.findAll({
+        attributes: ['id', 'name'],
+        where: {
+            id: {
+                [Op.notIn]: userIds
+            }
+        }
+    });
+    return res.status(200).json({ success: true, users: users });
+}
+
 exports.createGroup = async (request, response, next) => {
     try {
         const user = request.user;
-        const { name, membersNo, membersIds } = request.body;
-        //yaha se mujhe start karna hai.
+        const { name, description, membersNo, membersIds, dp_url } = request.body;
         const group = await user.createGroup({
             name,
             membersNo,
+            dp_url,
+            description,
             AdminId: user.id
         })
         membersIds.push(user.id);
@@ -120,6 +132,23 @@ exports.createGroup = async (request, response, next) => {
             return Number(ele)
         }));
         console.log(group.id);
+        return response.status(200).json({ group, message: "Group is succesfylly created" })
+
+    } catch (error) {
+        console.log(error);
+        return response.status(500).json({ message: 'Internal Server error!' })
+    }
+}
+
+exports.updateGroup = async (request, response, next) => {
+    try {
+        const { name, description, dp_url, groupId } = request.body;
+        const group = await Group.findOne({ where: { id: groupId } })
+        await group.update({
+            name: name,
+            dp_url: dp_url,
+            description: description,
+        })
         return response.status(200).json({ group, message: "Group is succesfylly created" })
 
     } catch (error) {
@@ -145,7 +174,6 @@ exports.deleteGroup = async (req, res) => {
 
 exports.addUser = async (request, response, next) => {
     try {
-        const user = request.user;
         const { groupId } = request.query;
         const { usersToAddIds } = request.body;
         const group = await Group.findOne({ where: { id: Number(groupId) } });
@@ -164,17 +192,17 @@ exports.addUser = async (request, response, next) => {
 
 exports.removeUser = async (request, response, next) => {
     try {
-        const user = request.user;
         const { groupId } = request.query;
         const { usersToRemoveIds } = request.body;
         const group = await Group.findOne({ where: { id: Number(groupId) } });
         const currentNumberOfUsers = await group.countUsers();
         const updatedGroup = await group.removeUsers(usersToRemoveIds);
+        console.log('currentNumberOfUsers: ', currentNumberOfUsers);
+        console.log('usersToRemoveIds.length: ', usersToRemoveIds.length);
         const updatedNumberOfUsers = currentNumberOfUsers - usersToRemoveIds.length;
+        console.log('updatedNumberOfUsers: ', updatedNumberOfUsers);
         await group.update({ membersNo: updatedNumberOfUsers });
-        console.log('User removed from the group successfully.');
         return response.status(200).json({ updatedGroup, message: "Group is succesfylly updated" })
-
     } catch (error) {
         console.log(error);
         return response.status(500).json({ message: 'Internal Server error!' })
@@ -223,8 +251,11 @@ exports.getGroupMembersbyId = async (request, response, next) => {
                 name: ele.name,
             }
         })
+        const userIds = AllusersData.map((ele) => {
+            return ele.id;
+        })
 
-        response.status(200).json({ users, message: "Group members name succesfully fetched" })
+        response.status(200).json({ users, userIds, message: "Group members name succesfully fetched" })
     } catch (error) {
         console.log(error);
         return response.status(500).json({ message: 'Internal Server error!' })
@@ -271,7 +302,7 @@ exports.getGroupChatHistory = async (request, response, next) => {
                 return {
                     messageId: ele.id,
                     message: ele.message,
-                    // isImage: ele.isImage,
+                    isImage: ele.isImage,
                     name: user.name,
                     userId: user.id,
                     date_time: ele.date_time

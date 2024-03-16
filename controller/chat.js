@@ -1,15 +1,16 @@
 const jwt = require('jsonwebtoken');
 const Chat = require('../models/Chat');
 
-// this is working fine..
+const dotenv = require('dotenv');
+dotenv.config();
+
+
 exports.addChat = (req, res) => {
-    const { message, token, groupId } = req.body;
-    console.log(groupId);
-    const obj = jwt.verify(token, 'secretKey');
-    console.log(obj);
+    const { message, token, groupId, isImage } = req.body;
+    const obj = jwt.verify(token, process.env.SECRET_KEY);
     const userId = obj.userId;
     const name = obj.name;
-    const promise = Chat.create({ message: message, userId: userId, GroupId: groupId });
+    const promise = Chat.create({ message: message, userId: userId, GroupId: groupId, isImage: isImage});
     promise.then(response => {
         console.log(response);
         return res.status(201).json({ message: response.message, name: name, date_time: response.date_time });
@@ -21,7 +22,7 @@ exports.addChat = (req, res) => {
 exports.getChat = async (req, res) => {
     try {
         const token = req.header('Authorization');
-        const obj = jwt.verify(token, 'secretKey');
+        const obj = jwt.verify(token, process.env.SECRET_KEY);
         const userId = obj.userId;
         const chats = await Chat.findAll({ where: { userId: userId } });
         return res.status(200).json({ chats: chats });

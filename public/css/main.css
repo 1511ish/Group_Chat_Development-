@@ -3,6 +3,10 @@
     margin: 0;
     box-sizing: border-box;
 }
+body {
+    overflow-y: hidden;
+    background-color: #0056b3;
+}
 
 body h1 {
     text-align: center;
@@ -12,6 +16,7 @@ body h1 {
     display: flex;
     background-color: tomato;
     user-select: none;
+    height: 100vh;
 }
 
 #group_related_container {
@@ -24,7 +29,6 @@ body h1 {
     flex: 7;
     /* background: rgb(240, 229, 229); */
     background: pink;
-    height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -146,7 +150,6 @@ body h1 {
     /* cursor: pointer; */
 }
 
-
 #create_newgroup_btn {
     color: #fff;
     background-color: black;
@@ -157,40 +160,6 @@ body h1 {
     margin-bottom: 4px;
 }
 
-
-#group_bottom {
-    /* background-color: brown; */
-    /* background-color: #25d366; */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    height: 100px;
-}
-
-#message_form {
-    /* background-color: red; */
-    display: flex;
-    width: 80%;
-    justify-content: center;
-    align-items: center;
-}
-
-#message_field {
-    margin: 0;
-}
-
-#message_form div {
-    background-color: #25d366;
-    padding: 8px;
-    height: 45px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.fa-paper-plane {
-    font-size: 180%;
-}
-
 ul li {
     list-style: none;
     font-size: 120%;
@@ -198,9 +167,31 @@ ul li {
     padding: 0.5%;
     color: #fff;
     display: inline-block;
-} 
+}
 
-#groupForm, #remove_user_form, #add_user_form{
+#groupForm,
+#remove_user_form,
+#add_user_form {
+    position: absolute;
+    top: 5%;
+    left: 40%;
+    background: #fff;
+    padding: 10px;
+    width: 30%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    visibility: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-height: 90%;
+    /* min-height: 80%; */
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#group_profile_edit_Form,
+#view_groupProfile_form {
     position: absolute;
     top: 16%;
     left: 40%;
@@ -213,6 +204,86 @@ ul li {
     border-radius: 10px;
     visibility: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-upload {
+    margin-bottom: 15px;
+}
+
+.avatar-upload input[type=file] {
+    display: none;
+}
+
+.avatar-upload label {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.avatar-upload label:hover {
+    background-color: #0056b3;
+}
+
+.group-name input[type=text] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.profile_container {
+    height: 250px;
+    width: 250px;
+    margin: auto;
+    background-color: pink;
+    padding: 0;
+    border-radius: 50%;
+    border: 4px solid green;
+}
+
+#preview1,
+#preview2,
+#preview3 {
+    max-width: 245px;
+    min-width: 245px;
+    min-height: 245px !important;
+    max-height: 245px !important;
+    border-radius: 50%;
+    background-color: gray;
+}
+
+#preview {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    background: transparent !important;
+    height: 250px;
+    width: 400px !important;
+    overflow: hidden;
+    visibility: hidden;
+    background-color: #868586;
+}
+
+#groupProfileForm .submit-button {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#groupProfileForm .submit-button:hover {
+    background-color: #218838;
 }
 
 form hr {
@@ -274,17 +345,22 @@ legend {
     align-items: center;
 }
 
-#removeuserList{
+#removeuserList,
+#adduserList {
     max-height: 200px;
     overflow-y: auto;
 }
-#removeuserList div{
+
+#removeuserList div,
+#adduserList div {
     padding: 2px;
     display: flex;
     justify-content: space-between !important;
     align-items: center;
 }
-#removeuserList label {
+
+#removeuserList label,
+#adduserList label {
     display: flex;
     align-items: center;
 }
@@ -305,7 +381,7 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: darkblue;
 }
 
 #userList::-webkit-scrollbar {
@@ -339,16 +415,20 @@ input[type="text"],
 input[type="submit"] {
     width: 100%;
     padding: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
 }
 
+#send_btn {
+    background-color: red;
+    padding: 0;
+}
+
 textarea {
     width: 100%;
     padding: 10px;
-    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
@@ -398,7 +478,7 @@ textarea {
     display: inline-block;
 }
 
-.dots{
+.dots {
     cursor: pointer;
 }
 
@@ -411,7 +491,7 @@ textarea {
     z-index: 1;
     padding: 10px;
     width: 200px;
-    right:5px;
+    right: 5px;
 }
 
 .options_menu ul {
@@ -420,7 +500,8 @@ textarea {
     margin: 0;
     background-color: none !important;
 }
-.options_menu ul li{
+
+.options_menu ul li {
     display: block;
 }
 
@@ -435,3 +516,96 @@ textarea {
     background-color: #ddd;
 }
 
+
+
+.form-header {
+    display: flex;
+    align-items: center;
+}
+
+.form-header h4 {
+    /* color: red; */
+    width: 95%;
+}
+
+.form-header .fa-xmark {
+    font-size: 130%;
+    padding: 6px 8px;
+    border-radius: 50%;
+}
+
+.form-header .fa-xmark:hover {
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+
+#group_bottom {
+    /* background-color: brown; */
+    /* background-color: #25d366; */
+    background-color: #333;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    height: 100px;
+}
+
+#message_form {
+    display: flex;
+    width: 90%;
+    justify-content: center;
+    align-items: center;
+}
+
+#message_form div div {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 20px;
+    width: 100%;
+
+}
+
+#message_form div {
+    width: 80%;
+}
+
+#message_field {
+    margin: 0;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    font-size: 107%;
+}
+
+#fileInput {
+    display: none;
+}
+
+#message_form .send_btn {
+    color: #25d366;
+    font-size: 180%;
+    width: 0;
+    margin: 2%;
+    padding: 0;
+}
+
+.fa-paperclip {
+    font-size: 120%;
+    margin-right: 10px;
+    color: grey;
+}
+
+.fa-paperclip:hover {
+    cursor: pointer;
+}
+
+.chat-image {
+    max-height: 300px;
+}
+
+.VGP-bundle {
+    text-align: center;
+    padding-bottom: 5px;
+}

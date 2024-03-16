@@ -2,8 +2,8 @@ const express = require('express');
 const sequelize = require('./util/database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const upload = multer();
 
 const User = require('./models/User');
 const Chat = require('./models/Chat');
@@ -13,11 +13,12 @@ const GroupMember = require('./models/Group-members');
 const userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chat');
 
+const Awsservice = require('./services/awsservice');
+
 const app = express();
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST'],
-
 }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
@@ -28,6 +29,18 @@ app.use('/home', (req, res) => {
 })
 app.use('/user', userRoutes);
 app.use('/chat', chatRoutes);
+app.post('/upload', upload.single('media'), async (req, res) => {
+    try {
+        const file = req.file;
+        const filename = file.originalname;
+        const data = file.buffer;
+        const URL = await Awsservice.uploadToS3(data, filename);
+        return res.status(201).send(URL);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('Error uploading file to S3');
+    }
+});
 app.get('/', (req, res) => {
     res.sendFile('notfound.html', { root: 'views' });
 });
@@ -37,7 +50,7 @@ Chat.belongsTo(User);
 Groups.hasMany(Chat, { constraints: true, onDelete: 'CASCADE' });
 Chat.belongsTo(Groups);
 User.belongsToMany(Groups, { through: GroupMember });
-Groups.belongsToMany(User, { through: GroupMember ,onDelete: 'CASCADE'});
+Groups.belongsToMany(User, { through: GroupMember, onDelete: 'CASCADE' });
 Groups.belongsTo(User, { foreignKey: 'AdminId', constraints: true, onDelete: 'CASCADE' })
 
 const PORT = process.env.PORT
