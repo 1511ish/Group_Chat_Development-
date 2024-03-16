@@ -1,4 +1,4 @@
-
+// require('dotenv').config();
 const create_newgroup_btn = document.getElementById('create_newgroup_btn');
 const group_container = document.getElementById('group_container');
 const token = localStorage.getItem('token');
@@ -38,12 +38,6 @@ function displayMenu() {
         optionsMenu.style.display = "block";
         // optionRemove = document.querySelector(".option_remove");
     }
-    // optionRemove.addEventListener("click", function (event) {
-    // event.preventDefault();
-    // removeUserForm.style.display = "block";
-    // removeUserForm.style.visibility = 'visible';
-
-    // });
 }
 
 async function addUserform(groupId) {
@@ -55,7 +49,7 @@ async function addUserform(groupId) {
     const { userIds } = memberApi.data;
     console.log(userIds);
 
-    const response = await axios.get('http://localhost:3000/user/getAllUserExcept', { headers: { 'Authorization': token, userIds: JSON.stringify(userIds) } });
+    const response = await axios.get(`/user/getAllUserExcept`, { headers: { 'Authorization': token, userIds: JSON.stringify(userIds) } });
     const users = response.data.users
 
     // Initialize checked state for each user
@@ -71,7 +65,7 @@ async function addUserform(groupId) {
             const div = document.createElement('div');
             const isChecked = userCheckedState[user.id];
             div.innerHTML = `<div>
-                              <label for="${user.id}"><img src="/dp.PNG" alt="" class="avatar">${user.name}</label>
+                              <label for="${user.id}"><img src="/img/user.PNG" alt="" class="avatar">${user.name}</label>
                            </div>
                            <input type="checkbox" id="${user.id}" name="users" value="${user.id}" ${isChecked ? 'checked' : ''}>`;
             userList.appendChild(div);
@@ -104,7 +98,7 @@ async function addUserform(groupId) {
             userCheckedState[user] = false;
         });
         groupForm.reset();
-        const response = await axios.post(`http://localhost:3000/user/update-group/add-user?groupId=${groupId}`, { usersToAddIds: selectedUsers }, { headers: { 'Authorization': token } });
+        const response = await axios.post(`/user/update-group/add-user?groupId=${groupId}`, { usersToAddIds: selectedUsers }, { headers: { 'Authorization': token } });
         alert(response.data.message);
         addUserForm.style.visibility = 'hidden';
         // Re-render user list with all users unchecked
@@ -124,7 +118,6 @@ async function removeUserform(groupId) {
 
     const memberApi = await axios(`get-group-members?groupId=${groupId}`, { headers: { 'Authorization': token } });
     const { users } = memberApi.data;
-    // console.log(users);
 
     // Initialize checked state for each user
     const userCheckedState = {};
@@ -139,7 +132,7 @@ async function removeUserform(groupId) {
             const div = document.createElement('div');
             const isChecked = userCheckedState[user.id];
             div.innerHTML = `<div>
-                               <label for="${user.id}"><img src="/dp.PNG" alt="" class="avatar">${user.name}</label>
+                               <label for="${user.id}"><img src="/img/user.PNG" alt="" class="avatar">${user.name}</label>
                             </div>
                             <input type="checkbox" id="${user.id}" name="users" value="${user.id}" ${isChecked ? 'checked' : ''}>`;
             userList.appendChild(div);
@@ -178,7 +171,7 @@ async function removeUserform(groupId) {
         console.log(selectedUsers.length);
         console.log('Selected Users:', selectedUsers);
         removeUserForm.reset();
-        const response = await axios.post(`http://localhost:3000/user/update-group/remove-user?groupId=${groupId}`, { usersToRemoveIds: selectedUsers }, { headers: { 'Authorization': token } });
+        const response = await axios.post(`/user/update-group/remove-user?groupId=${groupId}`, { usersToRemoveIds: selectedUsers }, { headers: { 'Authorization': token } });
         alert(response.data.message);
     }
 }
@@ -190,7 +183,7 @@ async function groupProfileEditform(groupId) {
     const groupName = document.getElementById('groupEditName');
     const description = document.getElementById('edit_description');
 
-    const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+    const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
     preview3.src = group.dp_url;
     groupName.value = `${group.name}`;
@@ -214,7 +207,7 @@ async function groupProfileEditform(groupId) {
                         groupId: groupId
                     }
                     console.log(data);
-                    axios.post('http://localhost:3000/user/update-group', data, { headers: { 'Authorization': token } });
+                    axios.post(`/user/update-group`, data, { headers: { 'Authorization': token } });
                 })
                 .then(res => {
                     alert("Group successfully updated.");
@@ -232,9 +225,8 @@ async function groupProfileEditform(groupId) {
                 dp_url: group.dp_url,
                 groupId: groupId
             }
-            axios.post('http://localhost:3000/user/update-group', data, { headers: { 'Authorization': token } })
+            axios.post(`/user/update-group`, data, { headers: { 'Authorization': token } })
             .then(res => {
-                console.log("working..")
                 alert("Group successfully updated.");
             })
             .catch(error => {
@@ -253,7 +245,7 @@ const VGP_description = document.getElementById('VGP_description');
 const preview2 = document.getElementById('preview2');
 async function viewGroupProfile2() {
     view_groupProfile_form.style.visibility = 'visible';
-    const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+    const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
     preview2.src = group.dp_url;
     VGP_groupname.innerHTML = `${group.name}`;
@@ -262,7 +254,7 @@ async function viewGroupProfile2() {
 
 async function viewGroupProfile(groupId) {
     view_groupProfile_form.style.visibility = 'visible';
-    const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+    const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
     preview2.src = group.dp_url;
     VGP_groupname.innerHTML = `${group.name}`;
@@ -271,7 +263,7 @@ async function viewGroupProfile(groupId) {
 
 async function deleteGroup(groupId) {
     try {
-        const response = await axios.delete(`http://localhost:3000/user/delete-group?groupId=${groupId}`, { headers: { 'Authorization': token } });
+        const response = await axios.delete(`/user/delete-group?groupId=${groupId}`, { headers: { 'Authorization': token } });
         alert(response.data.message);
     } catch (err) {
         console.log(err);
@@ -286,7 +278,7 @@ create_newgroup_btn.addEventListener('click', async (e) => {
     const userList = document.getElementById('userList');
     groupForm.style.visibility = 'visible';
 
-    const response = await axios.get('http://localhost:3000/user/getAll', { headers: { 'Authorization': token } });
+    const response = await axios.get(`/user/getAll`, { headers: { 'Authorization': token } });
     const users = response.data.users
 
     // Initialize checked state for each user
@@ -325,12 +317,11 @@ create_newgroup_btn.addEventListener('click', async (e) => {
             const userId = e.target.id;
             userCheckedState[userId] = e.target.checked;
         }
-        console.log(userCheckedState);
+        // console.log(userCheckedState);
     });
 
     groupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log("groupForm submited.");
         const groupName = document.getElementById('groupName').value;
         const description = document.getElementById('description').value;
         const fileInput = document.querySelector('input[name="profile"]');
@@ -357,7 +348,7 @@ create_newgroup_btn.addEventListener('click', async (e) => {
                     description: description,
                     dp_url: response.data
                 }
-                axios.post('http://localhost:3000/user/create-group', data, { headers: { 'Authorization': token } });
+                axios.post(`/user/create-group`, data, { headers: { 'Authorization': token } });
             })
             .then(res => {
                 alert("Group successfully created");
@@ -376,7 +367,7 @@ create_newgroup_btn.addEventListener('click', async (e) => {
 
 async function ShowGroup() {
     try {
-        const groupsResponse = await axios(`http://localhost:3000/user/get-mygroups`, { headers: { 'Authorization': token } });
+        const groupsResponse = await axios(`/user/get-mygroups`, { headers: { 'Authorization': token } });
         const { groups } = groupsResponse.data;
         let html = "";
         groups.forEach((ele) => {
@@ -452,17 +443,6 @@ function showChatOnScreen(chatHistory, userId) {
                </div>`
             }
         } else {
-            // if (ele.isImage) {
-            //     messageText += `                            
-            //     <div class="col-12 mb-2 pe-0">
-            //         <div class="card p-2 float-start rounded-4 chat-class">
-            //             <p class="text-danger my-0"><small>${ele.name}</small></p>
-            //             <a href="${ele.message}" target="_blank">
-            //             <img src="${ele.message}" class="chat-image">
-            //           </a>
-            //             <small class="text-muted">${formattedDate}</small>
-            //         </div>
-            //     </div>`
             if (ele.isImage) {
                 messageText += `<div class="card incoming">
                                    <small class="text-primary">${ele.name}</small>
@@ -481,16 +461,6 @@ function showChatOnScreen(chatHistory, userId) {
                    <small class="text-muted text-end">${formattedDate}</small>
                 </div>`
             }
-            // } else { }
-            // messageText += `                            
-            // <div class="col-12 mb-2 pe-0">
-            //     <div class="card p-2 float-end rounded-4 chat-class">
-            //         <p class="text-danger my-0"><small>${ele.name}</small></p>
-            //         <p class="my-0">${ele.message}</p>
-            //         <small class="text-muted">${formattedDate}</small>
-            //     </div>
-            // </div>`
-
         }
 
     })
@@ -510,7 +480,7 @@ async function setupGroup(groupId, userId) {
             group_editbtn.classList.add('d-none')
 
         } else {
-            const APIresponse = await axios(`http://localhost:3000/user/get-group?groupId=${groupId}`);
+            const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
             const { group } = APIresponse.data;
             group_img.src = group.dp_url;
             group_heading.innerHTML = `${group.name}`;
@@ -607,7 +577,7 @@ messageForm.addEventListener('submit', async function (event) {
             groupId: groupId,
             isImage: false
         }
-        const response = await axios.post('http://localhost:3000/chat/add', data)
+        const response = await axios.post(`/chat/add`, data)
         const date = new Date(response.data.date_time);
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         const formattedDate = date.toLocaleString('en-US', options);
@@ -629,7 +599,7 @@ messageForm.addEventListener('submit', async function (event) {
                     isImage: true
                 }
                 console.log(data);
-                const response = await axios.post('http://localhost:3000/chat/add', data)
+                const response = await axios.post(`/chat/add`, data)
                 const date = new Date(response.data.date_time);
                 const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
                 const formattedDate = date.toLocaleString('en-US', options);
