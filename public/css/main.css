@@ -52,6 +52,8 @@ body h1 {
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    border: 2px solid green;
+    /* min-height: 100%; */
 }
 
 #group_container li div {
@@ -61,7 +63,8 @@ body h1 {
 }
 
 #group_header {
-    /* background-color: red; */
+    background-color: #333;
+    color: #fff;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -75,11 +78,13 @@ body h1 {
     height: 50px;
     width: 50px;
     border-radius: 50%;
+    border: 2px solid green;
 }
 
 #chat_body {
-    /* background-color: lightblue; */
-    background-color: #363636;
+    /* background-color: #363636; */
+    /* background-color: #fff; */
+    background-color:#797777;
     height: 100%;
     width: 100%;
     padding: 10px;
@@ -114,14 +119,15 @@ body h1 {
 
 .text-danger {
     color: red;
-}
-
-.chat {
-    padding: 10px 0;
+    display: block;
 }
 
 .text-primary {
     color: blue;
+    display: block;
+}
+.chat {
+    padding: 10px 0;
 }
 
 .text-end {
@@ -176,6 +182,7 @@ ul li {
     top: 5%;
     left: 40%;
     background: #fff;
+    color:#333;
     padding: 10px;
     width: 30%;
     text-align: center;
@@ -188,6 +195,7 @@ ul li {
     /* min-height: 80%; */
     overflow-y: scroll;
     overflow-x: hidden;
+    z-index: 5;
 }
 
 #group_profile_edit_Form,
@@ -196,6 +204,7 @@ ul li {
     top: 16%;
     left: 40%;
     background: #fff;
+    color:#333;
     padding: 10px;
     width: 30%;
     text-align: center;
@@ -204,6 +213,7 @@ ul li {
     border-radius: 10px;
     visibility: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 5;
 }
 
 .avatar-upload {
@@ -242,7 +252,7 @@ ul li {
     height: 250px;
     width: 250px;
     margin: auto;
-    background-color: pink;
+    /* background-color: pink; */
     padding: 0;
     border-radius: 50%;
     border: 4px solid green;
@@ -251,12 +261,15 @@ ul li {
 #preview1,
 #preview2,
 #preview3 {
-    max-width: 245px;
-    min-width: 245px;
-    min-height: 245px !important;
-    max-height: 245px !important;
+    max-width: 1005;
+    min-width: 100%;
+    min-height: 100% !important;
+    max-height: 100% !important;
     border-radius: 50%;
-    background-color: gray;
+    /* background-color: gray; */
+}
+#preview1{
+    background-color: rgb(209, 204, 204);
 }
 
 #preview {
@@ -265,10 +278,16 @@ ul li {
     left: 50%;
     background: transparent !important;
     height: 250px;
-    width: 400px !important;
+    /* width: 350px !important; */
+    max-width: 25% !important;
     overflow: hidden;
-    visibility: hidden;
-    background-color: #868586;
+    /* visibility: hidden; */
+    /* background-color: #868586 !important; */
+}
+
+#preview img{
+    max-width: 100%;
+    max-height: 100%;
 }
 
 #groupProfileForm .submit-button {
@@ -470,7 +489,8 @@ textarea {
 }
 
 #three_dotes:hover {
-    background-color: rgb(253, 139, 158);
+    background-color:#f1f1f1;
+    color: #333;
 }
 
 .options {
@@ -602,10 +622,50 @@ textarea {
 }
 
 .chat-image {
-    max-height: 300px;
+    /* max-height: 300px; */
+    max-height: 500px;
+    max-width: 400px;
 }
 
 .VGP-bundle {
     text-align: center;
     padding-bottom: 5px;
+}
+
+
+.incoming_msgCount{
+    padding: 3px 7px;
+    border-radius: 50%;
+    background-color: #25d366;
+    color: #fff;
+    font-size: 110%;
+}
+
+#expanded-image {
+    display: none;
+    position: fixed;
+    /* position: relative; */
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* left: 31%;
+    width: 70%; */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    /* background-color: #797777; */
+    z-index: 9999;
+    transition: 2s
+}
+
+#expanded-image img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    min-height: 70%;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    /* box-shadow: 0 0 10px red; */
 }

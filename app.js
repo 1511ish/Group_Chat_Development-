@@ -20,11 +20,12 @@ const chatRoutes = require('./routes/chat');
 const Awsservice = require('./services/awsservice');
 
 const app = express();
-
+const server = http.createServer(app);
 const io = new Server(server);
 io.on('connection', (socket) => {
     console.log("a new user has connected", socket.id);
     socket.on('new-group-message', (groupId) => {
+        console.log("naya message aay abhai..",groupId);
         socket.broadcast.emit('group-message', groupId);
     })
 })
@@ -59,7 +60,7 @@ app.get('/', (req, res) => {
     // res.sendFile('demo.html', { root: 'views' });
 });
 
-const server = http.createServer(app);
+
 
 User.hasMany(Chat)
 Chat.belongsTo(User);

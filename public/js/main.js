@@ -1,3 +1,4 @@
+// const socket = io(window.location.href);
 const socket = io();
 
 const create_newgroup_btn = document.getElementById('create_newgroup_btn');
@@ -12,6 +13,7 @@ var optionsMenu = document.querySelector(".options_menu");
 var removeUserForm = document.querySelector("#remove_user_form");
 var addUserForm = document.querySelector("#add_user_form");
 var groupId;
+var src;
 
 function afterSetUp(groupId) {
     console.log("in afterSetUp method.");
@@ -174,6 +176,7 @@ async function removeUserform(groupId) {
         removeUserForm.reset();
         const response = await axios.post(`/user/update-group/remove-user?groupId=${groupId}`, { usersToRemoveIds: selectedUsers }, { headers: { 'Authorization': token } });
         alert(response.data.message);
+        removeUserForm.style.visibility = 'hidden';
     }
 }
 
@@ -186,7 +189,10 @@ async function groupProfileEditform(groupId) {
 
     const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
+    if(group.dp_url)
     preview3.src = group.dp_url;
+    else
+    preview3.src = src;
     groupName.value = `${group.name}`;
     description.value = `${group.description}`;
 
@@ -196,7 +202,7 @@ async function groupProfileEditform(groupId) {
         const fileInput = document.querySelector('input[name="avatar-upload3"]');
         const file = fileInput.files[0];
 
-        if(file){
+        if (file) {
             const formData = new FormData();
             formData.append('media', file);
             axios.post('/upload', formData)
@@ -212,6 +218,7 @@ async function groupProfileEditform(groupId) {
                 })
                 .then(res => {
                     alert("Group successfully updated.");
+                    groupProfileEditForm.style.visibility = 'hidden';
                     groupName.value = '';
                     description.value = '';
                 })
@@ -219,7 +226,7 @@ async function groupProfileEditform(groupId) {
                     console.error('Error:', error);
                 });
         }
-        else{
+        else {
             const data = {
                 name: groupName.value,
                 description: description.value,
@@ -227,12 +234,13 @@ async function groupProfileEditform(groupId) {
                 groupId: groupId
             }
             axios.post(`/user/update-group`, data, { headers: { 'Authorization': token } })
-            .then(res => {
-                alert("Group successfully updated.");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                .then(res => {
+                    alert("Group successfully updated.");
+                    groupProfileEditForm.style.visibility = 'hidden';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             groupName.value = '';
             description.value = '';
         }
@@ -244,11 +252,15 @@ const view_groupProfile_form = document.querySelector("#view_groupProfile_form")
 const VGP_groupname = document.getElementById('VGP_groupname');
 const VGP_description = document.getElementById('VGP_description');
 const preview2 = document.getElementById('preview2');
+
 async function viewGroupProfile2() {
     view_groupProfile_form.style.visibility = 'visible';
     const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
-    preview2.src = group.dp_url;
+    if (group.dp_url)
+        preview2.src = group.dp_url;
+    else
+        preview2.src = src;
     VGP_groupname.innerHTML = `${group.name}`;
     VGP_description.innerHTML = ` ${group.description}`;
 }
@@ -257,7 +269,10 @@ async function viewGroupProfile(groupId) {
     view_groupProfile_form.style.visibility = 'visible';
     const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
-    preview2.src = group.dp_url;
+    if (group.dp_url)
+        preview2.src = group.dp_url;
+    else
+        preview2.src = src;
     VGP_groupname.innerHTML = `${group.name}`;
     VGP_description.innerHTML = ` ${group.description}`;
 }
@@ -266,6 +281,7 @@ async function deleteGroup(groupId) {
     try {
         const response = await axios.delete(`/user/delete-group?groupId=${groupId}`, { headers: { 'Authorization': token } });
         alert(response.data.message);
+        ShowGroup();
     } catch (err) {
         console.log(err);
     }
@@ -318,7 +334,6 @@ create_newgroup_btn.addEventListener('click', async (e) => {
             const userId = e.target.id;
             userCheckedState[userId] = e.target.checked;
         }
-        // console.log(userCheckedState);
     });
 
     groupForm.addEventListener('submit', async (e) => {
@@ -337,26 +352,100 @@ create_newgroup_btn.addEventListener('click', async (e) => {
         renderUserList(users);
 
         const file = fileInput.files[0];
-        const formData = new FormData();
-        formData.append('media', file);
+        // const formData = new FormData();
+        // formData.append('media', file);
 
-        axios.post('/upload', formData)
-            .then(response => {
-                const data = {
-                    name: groupName,
-                    membersNo: selectedUsers.length + 1,
-                    membersIds: selectedUsers,
-                    description: description,
-                    dp_url: response.data
-                }
-                axios.post(`/user/create-group`, data, { headers: { 'Authorization': token } });
-            })
-            .then(res => {
-                alert("Group successfully created");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        // axios.post('/upload', formData)
+        //     .then(response => {
+        //         const data = {
+        //             name: groupName,
+        //             membersNo: selectedUsers.length + 1,
+        //             membersIds: selectedUsers,
+        //             description: description,
+        //             dp_url: response.data
+        //         }
+        //         return axios.post(`/user/create-group`, data, { headers: { 'Authorization': token } });
+        //     })
+        //     .then(res => {
+        //         alert("Group successfully created");
+        //         //create from shouild be disappear
+        //         groupForm.style.visibility = 'hidden';
+        //         //group list mein new group should be seen
+        //         const ele = res.data.group;
+        //         group_container.innerHTML += `               
+        //         <li onclick="showGroupChat(${ele.id})">
+        //            <div>
+        //                <img src="${ele.dp_url}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
+        //                <strong>${ele.name}</strong>
+        //                <small>${ele.membersNo} Members <small id="${ele.id}" class="incoming_msgCount" style="visibility: hidden;">0</small></small>
+        //            </div>
+        //         </li>`
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //     });
+
+        if (file) {
+            const formData = new FormData();
+            formData.append('media', file);
+            axios.post('/upload', formData)
+                .then(response => {
+                    const data = {
+                        name: groupName,
+                        membersNo: selectedUsers.length + 1,
+                        membersIds: selectedUsers,
+                        description: description,
+                        dp_url: response.data
+                    }
+                    return axios.post(`/user/create-group`, data, { headers: { 'Authorization': token } });
+                })
+                .then(res => {
+                    alert("Group successfully created");
+                    //create from shouild be disappear
+                    groupForm.style.visibility = 'hidden';
+                    //group list mein new group should be seen
+                    const ele = res.data.group;
+                    group_container.innerHTML += `               
+                    <li onclick="showGroupChat(${ele.id})">
+                       <div>
+                          <img src="${ele.dp_url}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
+                          <strong>${ele.name}</strong>
+                          <small>${ele.membersNo} Members <small id="${ele.id}" class="incoming_msgCount" style="visibility: hidden;">0</small></small>
+                       </div>
+                    </li>`
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        else {
+            const data = {
+                name: groupName,
+                membersNo: selectedUsers.length + 1,
+                membersIds: selectedUsers,
+                description: description,
+                // dp_url: response.data
+            }
+            axios.post(`/user/create-group`, data, { headers: { 'Authorization': token } })
+                .then(res => {
+                    alert("Group successfully created");
+                    //create from shouild be disappear
+                    groupForm.style.visibility = 'hidden';
+                    //group list mein new group should be seen
+                    const ele = res.data.group;
+                    group_container.innerHTML += `               
+                <li onclick="showGroupChat(${ele.id})">
+                   <div>
+                      <img src="${ele.dp_url}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
+                      <strong>${ele.name}</strong>
+                      <small>${ele.membersNo} Members <small id="${ele.id}" class="incoming_msgCount" style="visibility: hidden;">0</small></small>
+                   </div>
+                </li>`
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
     });
     cancel_btn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -372,20 +461,28 @@ async function ShowGroup() {
         const { groups } = groupsResponse.data;
         let html = "";
         groups.forEach((ele) => {
-            const date = new Date(ele.date);
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            const formattedDate = date.toLocaleString('en-US', options);
+            // const date = new Date(ele.date);
+            // const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            // const formattedDate = date.toLocaleString('en-US', options);
+
+            if (ele.dp_url) {
+                src = `${ele.dp_url}`;
+            } else {
+                console.log("in else condition.")
+                // src=`../public/img/group_img.webp`;
+                src = `https://groupchat-application.s3.ap-south-1.amazonaws.com/groupProfile.svg`;
+            }
             html += `               
             <li onclick="showGroupChat(${ele.id})">
                <div>
-                   <img src="${ele.dp_url}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
-                   <strong id="${ele.id}">${ele.name}</strong>
-                   <small id="${ele.id}">${ele.membersNo} Members</small>
+                   <img src="${src}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
+                   <strong>${ele.name}</strong>
+                   <small>${ele.membersNo} Members <small id="${ele.id}" class="incoming_msgCount" style="visibility: hidden;">0</small></small>
                </div>
             </li>    
         `
         })
-        group_container.innerHTML += html;
+        group_container.innerHTML = html;
     } catch (error) {
         console.log(error);
     }
@@ -397,15 +494,11 @@ async function showGroupChat(id) {
         groupId = id;
         const getUserResponse = await axios.get('/user/get-user', { headers: { 'Authorization': token } });
         const userId = getUserResponse.data.userId
-        if (groupId && groupId != "group_body") {
+        if (groupId) {
             setupGroup(groupId, userId)
-            if (groupId == 0) {
-                ShowCommonChats();
-            } else {
-                const APIresponse = await axios(`get-group-messages?groupId=${groupId}`);
-                const apiChats = APIresponse.data.chats
-                showChatOnScreen(apiChats, userId)
-            }
+            const APIresponse = await axios(`get-group-messages?groupId=${groupId}`);
+            const apiChats = APIresponse.data.chats
+            showChatOnScreen(apiChats, userId)
         } else {
             console.log("no group id");
         }
@@ -418,7 +511,13 @@ async function showGroupChat(id) {
 }
 
 function showChatOnScreen(chatHistory, userId) {
-    chat_body.innerHTNL = "";
+    const incoming_msg = document.getElementById(groupId);
+    incoming_msg.innerText = 0;
+    incoming_msg.style.visibility = 'hidden';
+
+    chat_body.innerHTNL = `<div id="expanded-image" onclick="closeExpandedImage()">
+                               <img src="" alt="Expanded Image">
+                           </div>;`
     let messageText = "";
     chatHistory.forEach((ele) => {
         const date = new Date(ele.date_time);
@@ -429,17 +528,24 @@ function showChatOnScreen(chatHistory, userId) {
                 messageText += `<div class="card outgoing">
                                    <small class="text-primary">${ele.name}</small>
                                     <div>
-                                      <a href="${ele.message}" target="_blank">
-                                      <img src="${ele.message}" class="chat-image">
-                                    </a>
+                                      <img src="${ele.message}" class="chat-image" onclick="expandImage(this.src)">
                                     </div>
                                    <small class="text-muted text-end">${formattedDate}</small>
                                 </div>`;
-            } else {
+            }
+            else if (ele.isVideo) {
+                messageText += `                            
+                <div class="card outgoing">
+                   <small class="text-primary">${ele.name}</small>  
+                   <video controls style="max-width: 300px; max-height: 300px;"><source src="${ele.message}"></video>;                       
+                   <small class="text-muted text-end">${formattedDate}</small>
+               </div>`
+            }
+            else {
                 messageText += `                            
                 <div class="card outgoing">
                    <small class="text-primary">${ele.name}</small>
-                   <p class="chat">${ele.message}</p>
+                   <p class="chat">${ele.message}</p> 
                    <small class="text-muted text-end">${formattedDate}</small>
                </div>`
             }
@@ -449,12 +555,21 @@ function showChatOnScreen(chatHistory, userId) {
                                    <small class="text-primary">${ele.name}</small>
                                     <div>
                                       <a href="${ele.message}" target="_blank">
-                                      <img src="${ele.message}" class="chat-image">
+                                      <img src="${ele.message}" class="chat-image" onclick="expandImage(this.src)">
                                     </a>
                                     </div>
                                    <small class="text-muted text-end">${formattedDate}</small>
                                 </div>`;
-            } else {
+            }
+            else if (ele.isVideo) {
+                messageText += `                            
+                <div class="card incoming">
+                   <small class="text-danger">${ele.name}</small>  
+                   <video controls style="max-width: 300px; max-height: 300px;"><source src="${ele.message}"></video>;                       
+                   <small class="text-muted text-end">${formattedDate}</small>
+               </div>`
+            }
+            else {
                 messageText += `                     
                 <div class="card incoming">
                    <small class="text-danger">${ele.name}</small>
@@ -466,61 +581,53 @@ function showChatOnScreen(chatHistory, userId) {
 
     })
     chat_body.innerHTML = messageText;
-    // chat_container.scrollTop = chat_container.scrollHeight;
+    chat_body.scrollTop = chat_body.scrollHeight;
+
+    // var scrollHeight = chat_body.scrollHeight;
+    // var currentScroll = chat_body.scrollTop;
+    // var difference = scrollHeight - currentScroll;
+    // var speed = 10; // Adjust this value to control the speed of scrolling
+
+    // Perform scrolling gradually
+    // var scrollInterval = setInterval(function () {
+    //     if (chat_body.scrollTop < scrollHeight) {
+    //         chat_body.scrollTop += difference > speed ? speed : difference;
+    //     } else {
+    //         clearInterval(scrollInterval); // Stop scrolling when reached the bottom
+    //     }
+    // }, 10); // Adjust this value to control the smoothness of scrolling
+
 }
 
 async function setupGroup(groupId, userId) {
     try {
-        // groupId = GroupId;
-        if (groupId == 0) {
-            group_img.src = `https://picsum.photos/seed/common/200`;
-            group_heading.innerHTML = `Common Group`;
-            group_members.innerHTML = ` All Members`;
-            group_members.setAttribute("title", `All Members can access this group !`);
-            formElements.message_btn.id = groupId;
-            group_editbtn.classList.add('d-none')
-
-        } else {
-            const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
-            const { group } = APIresponse.data;
+        const APIresponse = await axios(`/user/get-group?groupId=${groupId}`);
+        const { group } = APIresponse.data;
+        if (group.dp_url)
             group_img.src = group.dp_url;
-            group_heading.innerHTML = `${group.name}`;
-            group_members.innerHTML = ` ${group.membersNo} Members`;
-            const memberApi = await axios(`get-group-members?groupId=${groupId}`, { headers: { 'Authorization': token } });
-            const { users } = memberApi.data;
+        else
+            group_img.src = src;
+        group_heading.innerHTML = `${group.name}`;
+        group_members.innerHTML = ` ${group.membersNo} Members`;
+        const memberApi = await axios(`get-group-members?groupId=${groupId}`, { headers: { 'Authorization': token } });
+        const { users } = memberApi.data;
 
-            const usersString = users.map(item => item.name.trim()).join(',');
-            group_members.setAttribute("title", `You,${usersString}`);
-            // yaha pe issue hai bro...
-            send_btn.id = groupId
-            if (group.AdminId == userId) {
-                group_editbtn.classList.remove('d-none')
-                afterSetUp(groupId);
-            } else {
-                group_editbtn.classList.add('d-none')
-            }
+        const usersString = users.map(item => item.name.trim()).join(',');
+        group_members.setAttribute("title", `You,${usersString}`);
+        // yaha pe issue hai bro...
+        send_btn.id = groupId
+        if (group.AdminId == userId) {
+            group_editbtn.classList.remove('d-none')
+            afterSetUp(groupId);
+        } else {
+            group_editbtn.classList.add('d-none')
         }
 
-
     } catch (error) {
         console.log(error);
         alert(error.response.data.message);
     }
 }
-
-async function showGroupChats(groupId) {
-    try {
-        const APIresponse = await axios.get(`user/get-group-messages?groupId=${groupId}`);
-        const apiChats = APIresponse.data.chats
-        const getUserResponse = await axios.get('/user/get-user');
-        const userId = getUserResponse.data.userId
-        showChatOnScreen(apiChats, userId)
-    } catch (error) {
-        console.log(error);
-        alert(error.response.data.message);
-    }
-}
-
 
 const message = document.getElementById('message_field');
 const chat_body = document.getElementById('chat_body');
@@ -546,7 +653,7 @@ fileInput.addEventListener('change', function (event) {
             if (file.type.startsWith('image')) {
                 preview.innerHTML = `<img src="${src}" alt="Selected Image" style="min-width: 100%; min-height: 100%">`;
             } else if (file.type.startsWith('video')) {
-                preview.innerHTML = `<video controls style="max-width: 300px; max-height: 300px;"><source src="${src}" type="${file.type}"></video>`;
+                preview.innerHTML = `<video controls style="max-width: 100%; max-height: 100%; min-height:80%"><source src="${src}" type="${file.type}"></video>`;
             }
         };
 
@@ -563,22 +670,23 @@ messageForm.addEventListener('submit', async function (event) {
     // const messageInput = document.querySelector('input[name="message"]');
     const message = messageInput.value.trim();
     messageInput.value = '';
-    console.log(message);
+    // console.log(message);
 
     // Get the selected media file
     const file = fileInput.files[0];
 
     // Create a new FormData object
     const formData = new FormData();
-
     if (message) {
         const data = {
             token: localStorage.getItem('token'),
             message: message,
             groupId: groupId,
-            isImage: false
+            isImage: false,
+            isVideo: false
         }
         const response = await axios.post(`/chat/add`, data)
+        // socket.emit('new-group-message', groupId);
         const date = new Date(response.data.date_time);
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         const formattedDate = date.toLocaleString('en-US', options);
@@ -588,6 +696,42 @@ messageForm.addEventListener('submit', async function (event) {
                         <p class="chat">${response.data.message}</p>
                         <small class="text-muted text-end">${formattedDate}</small>
                     </div>`;
+
+        socket.emit('new-group-message', groupId);
+    }
+    else if (file.type.startsWith('video')) {
+        formData.append('media', file);
+        axios.post('/upload', formData)
+            .then(async (res) => {
+                const data = {
+                    token: localStorage.getItem('token'),
+                    message: res.data,
+                    groupId: groupId,
+                    isImage: false,
+                    isVideo: true
+                }
+                console.log(data);
+                const response = await axios.post(`/chat/add`, data)
+                const date = new Date(response.data.date_time);
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+                const formattedDate = date.toLocaleString('en-US', options);
+
+                chat_body.innerHTML += ` <div class="card outgoing">
+                                <small class="text-primary">${response.data.name}</small>
+                                <div>
+                                <video controls style="max-width: 300px; max-height: 300px;"><source src="${response.data.message}"></video>
+                                </div>
+                                <small class="text-muted text-end">${formattedDate}</small>
+                            </div>`;
+
+                socket.emit('new-group-message', groupId);
+                fileInput.value = '';
+                preview.innerHTML = '';
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
     else {
         formData.append('media', file);
@@ -597,9 +741,9 @@ messageForm.addEventListener('submit', async function (event) {
                     token: localStorage.getItem('token'),
                     message: res.data,
                     groupId: groupId,
-                    isImage: true
+                    isImage: true,
+                    isVideo: false
                 }
-                console.log(data);
                 const response = await axios.post(`/chat/add`, data)
                 const date = new Date(response.data.date_time);
                 const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -614,8 +758,9 @@ messageForm.addEventListener('submit', async function (event) {
                                 <small class="text-muted text-end">${formattedDate}</small>
                             </div>`;
 
+                socket.emit('new-group-message', groupId);
                 fileInput.value = '';
-                preview.innerHTML = '';                   
+                preview.innerHTML = '';
 
             })
             .catch(error => {
@@ -624,20 +769,36 @@ messageForm.addEventListener('submit', async function (event) {
     }
 
 
-    socket.emit('new-group-message', groupId)
+
     // showGroupChats(groupId)
+    chat_body.scrollTop = chat_body.scrollHeight;
 
 });
 
-
 socket.on('group-message', async (groupId_P) => {
-    if (groupId == groupId_P) {
-        showGroupChats(groupId);
+    if (groupId === groupId_P) {
+        showGroupChat(groupId);
     }
-    else{
+    else {
         const APIresponse = await axios(`/user/get-group?groupId=${groupId_P}`);
         const { group } = APIresponse.data;
-        group_heading.innerHTML = ``;
-        alert(`there is some imcoming messages from ${group.name} group.`);
+        const incoming_msg = document.getElementById(group.id);
+        incoming_msg.style.visibility = 'visible';
+        incoming_msg.innerText = parseInt(incoming_msg.innerText) + 1;
+
     }
 })
+
+
+
+function expandImage(src) {
+    var expandedImage = document.getElementById('expanded-image');
+    var imageElement = expandedImage.querySelector('img');
+    imageElement.src = src;
+    expandedImage.style.display = 'block';
+}
+
+function closeExpandedImage() {
+    var expandedImage = document.getElementById('expanded-image');
+    expandedImage.style.display = 'none';
+}

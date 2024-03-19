@@ -52,9 +52,12 @@
             </ul>
         </div>
         <div id="chat_container">
+            <div id="expanded-image" onclick="closeExpandedImage()">
+                <img src="" alt="Expanded Image">
+            </div>
             <div id="group_header">
-                <img src="https://picsum.photos/seed/common/200" alt="Profile Picture" id="group_img" onclick='viewGroupProfile2()'>
-                <h3><strong class="mb-1" id="group_heading">Common Group</strong></h3>
+                <img src="https://picsum.photos/seed/common/200" alt="Profile Picture" id="group_img">
+                <h3><strong class="mb-1" id="group_heading">Demo Group Chatbox</strong></h3>
                 <div>
                     <small id="group_members"
                     title="All Members can access this group !">All Members</small>
@@ -154,16 +157,13 @@
                 </div>
                 <div class="card incoming">
                     <small class="text-danger">sonu</small>
-                    <p class="chat">Another incoming message here.I love you 💖</p>
+                    <p class="chat">Another incoming message here💖.</p>
                     <small class="text-muted text-end">16 Feb, 2024 06:33 AM</small>
                 </div>
                 <div class="card outgoing">
                     <small class="text-primary">sonu</small>
                     <p class="chat">Another outgoing message here.</p>
                     <small class="text-muted text-end">16 Feb, 2024 06:33 AM</small>
-                </div>
-                <div class="card outgoing">
-                    <img src="https://groupchat-application.s3.ap-south-1.amazonaws.com/WIN_20240126_23_35_02_Pro.jpg" alt="image" style="max-width: 300px; max-height: 300px;">
                 </div>
             </div>
             <div id="group_bottom">
@@ -185,7 +185,9 @@
         </div>
     </div>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/js/main.js"></script> 
+    
     <script>
         function closeForm(id) {
             const form = document.getElementById(id);

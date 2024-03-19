@@ -6,13 +6,12 @@ dotenv.config();
 
 
 exports.addChat = (req, res) => {
-    const { message, token, groupId, isImage } = req.body;
+    const { message, token, groupId, isImage,isVideo } = req.body;
     const obj = jwt.verify(token, process.env.SECRET_KEY);
     const userId = obj.userId;
     const name = obj.name;
-    const promise = Chat.create({ message: message, userId: userId, GroupId: groupId, isImage: isImage});
+    const promise = Chat.create({ message: message, userId: userId, GroupId: groupId, isImage: isImage, isVideo: isVideo});
     promise.then(response => {
-        console.log(response);
         return res.status(201).json({ message: response.message, name: name, date_time: response.date_time });
     }).catch(err => {
         console.log(err);

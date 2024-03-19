@@ -16,6 +16,10 @@ const Chat = sequelize.define('chat', {
         type: Sequelize.BOOLEAN,
         defaultValue: false
     },
+    isVideo: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+    },
     date_time: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),

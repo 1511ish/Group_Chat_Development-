@@ -303,6 +303,7 @@ exports.getGroupChatHistory = async (request, response, next) => {
                     messageId: ele.id,
                     message: ele.message,
                     isImage: ele.isImage,
+                    isVideo: ele.isVideo,
                     name: user.name,
                     userId: user.id,
                     date_time: ele.date_time
@@ -313,7 +314,7 @@ exports.getGroupChatHistory = async (request, response, next) => {
             }
         }));
 
-        console.log(chats);
+        // console.log(chats);
         return response.status(200).json({ chats, message: "User chat History Fetched" })
 
     } catch (error) {
