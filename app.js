@@ -18,6 +18,9 @@ const userRoutes = require('./routes/user');
 const chatRoutes = require('./routes/chat');
 
 const Awsservice = require('./services/awsservice');
+const cronService = require('./services/cron');
+
+cronService.job.start();
 
 const app = express();
 const server = http.createServer(app);
