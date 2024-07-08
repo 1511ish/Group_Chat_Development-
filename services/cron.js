@@ -1,7 +1,7 @@
 const { CronJob } = require('cron');
 const {Op} = require('sequelize');
-const ChatHistory = require('../models/Chat');
-const ArchivedChat = require('../models/archeived-chat');
+const ChatHistory = require('../models/chat');
+const ArchivedChat = require('../models/archeived_chat');
 exports.job = new CronJob(
     '0 0 * * *', 
     function () {
@@ -15,12 +15,13 @@ exports.job = new CronJob(
 async function archiveOldRecords() {
     try {
       const twoDaysAgo = new Date();
-      tenDaysAgo.setDate(tenDaysAgo.getDate() - 2);
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      
       // Find records to archive
       const recordsToArchive = await ChatHistory.findAll({
         where: {
           date_time: {
-            [Op.lt]: tenDaysAgo,
+            [Op.lt]: twoDaysAgo,
           },
         },
       });
@@ -46,34 +47,3 @@ async function archiveOldRecords() {
     }
   }
 
-// async function archiveOldRecords() {
-//     try {
-  
-//       const fiveMinutesAgo = new Date();
-//       fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
-  
-//       // Find records to archive
-//       const recordsToArchive = await ChatHistory.findAll({
-//         where: {
-//           date_time: {
-//             [Op.lt]: fiveMinutesAgo,
-//           },
-//         },
-//       });  
-//       await Promise.all(
-//         recordsToArchive.map(async (record) => {
-//           await ArchivedChat.create({
-//             id: record.id,
-//             message: record.message,
-//             isImage:record.isImage, 
-//             date_time: record.date_time,
-//             UserId: record.UserId,
-//             GroupId: record.GroupId
-//           });
-//           await record.destroy();
-//         })
-//       );
-//     } catch (error) {
-//       console.error('Error archiving old records:', error);
-//     }
-//   }

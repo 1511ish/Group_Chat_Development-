@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div{
+            background-color: orange;
+        }
+        li small{
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <li id="l">
+        <div>
+            <strong>${ele.name}</strong>
+            <small>two Members <small id="${ele.id}" class="incoming_msgCount">0</small></small>
+         </div>
+    </li>
+    <button id="btn">click</button>
+    <script>
+        let li = document.getElementById('l');
+        let btn = document.getElementById('btn');
+        btn.addEventListener("click",(e) => {
+            li.small.innerHTML = 'three';
+        })
+    </script>
+</body>
+</html>

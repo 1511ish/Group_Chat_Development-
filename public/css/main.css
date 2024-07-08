@@ -53,6 +53,7 @@ body h1 {
     height: 50px;
     border-radius: 50%;
     border: 2px solid green;
+    /* border: 2px solid brown; */
     /* min-height: 100%; */
 }
 
@@ -84,7 +85,8 @@ body h1 {
 #chat_body {
     /* background-color: #363636; */
     /* background-color: #fff; */
-    background-color:#797777;
+    /* background-color:#797777; */
+    background-color:#424242;
     height: 100%;
     width: 100%;
     padding: 10px;
@@ -126,6 +128,7 @@ body h1 {
     color: blue;
     display: block;
 }
+
 .chat {
     padding: 10px 0;
 }
@@ -137,6 +140,9 @@ body h1 {
 
 #chat_body::-webkit-scrollbar {
     width: 6px;
+}
+#groupForm::-webkit-scrollbar{
+    width: 0px;
 }
 
 /* Track */
@@ -249,19 +255,30 @@ ul li {
 }
 
 .profile_container {
+    /* min-height: 250px; 
+    min-width: 250px;
     height: 250px;
-    width: 250px;
+    width: 250px; */
+    height: 200px;
+    width: 200px;
     margin: auto;
     /* background-color: pink; */
     padding: 0;
     border-radius: 50%;
-    border: 4px solid green;
+    /* border: 4px solid green; */
+}
+.profile_container img{
+    /* max-width: 100%;
+    max-height: 100%; */
+    /* border: 2px solid red; */
+    width: 100%;
+    height: 100%;
+    border: 2px solid green;
 }
 
 #preview1,
 #preview2,
 #preview3 {
-    max-width: 1005;
     min-width: 100%;
     min-height: 100% !important;
     max-height: 100% !important;
@@ -269,12 +286,12 @@ ul li {
     /* background-color: gray; */
 }
 #preview1{
-    background-color: rgb(209, 204, 204);
+    /* background-color: rgb(209, 204, 204); */
 }
 
 #preview {
     position: absolute;
-    bottom: 0px;
+    bottom: 60px;
     left: 50%;
     background: transparent !important;
     height: 250px;
@@ -668,4 +685,45 @@ textarea {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     /* box-shadow: 0 0 10px red; */
+}
+
+
+
+
+/* Responiseness */
+@media (max-width: 600px) {
+    #container {
+        font-size: x-small;
+    }
+    #create_newgroup_btn{
+        font-size: small;
+    }
+    #group_header img{
+        width: 35px;
+    }
+    #three_dotes{
+        padding: 5px 10px;
+    }
+    #group_related_container{
+        padding: 10px;
+    }
+    #group_container li div img{
+        width: 35px;
+        height:35px;
+    }
+    #group_bottom{
+        padding: 5px;
+    }
+    #group_bottom{
+        height: 50px;
+    }
+    .profile_container{
+        height: 60%;
+        width: 60%;
+    }
+    .cancel_btn,button[type="submit"]{
+        font-size: xx-small;
+        padding: 5px 10px;
+        overflow: hidden;
+    }
 }

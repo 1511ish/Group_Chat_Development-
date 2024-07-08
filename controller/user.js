@@ -1,6 +1,6 @@
-const User = require('../models/User');
-const Group = require('../models/groups');
-const Chat = require('../models/Chat');
+const User = require('../models/user');
+const Group = require('../models/group');
+const Chat = require('../models/chat');
 // const DB = require('../util/database');
 
 const bcrypt = require('bcrypt');
@@ -17,9 +17,9 @@ exports.signUp = async (req, res) => {
                 console.error(err);
                 return res.status(500).json({ message: 'Internal server error' });
             }
-            console.log(hash);
+            // console.log(hash);
             try {
-                await User.create({ name: name, email_Id: email, phone_No: phone_no, password: hash });
+                await User.create({ name: name, emailId: email, mobile: phone_no, password: hash });
                 res.status(201).json({ message: 'Successfully created new user' });
                 console.log('SUCCESSFULLY ADDED');
             } catch (error) {
@@ -61,13 +61,17 @@ exports.getLoginPage = async (req, res) => {
     res.sendFile('login.html', { root: 'views' });
 }
 
+exports.getSignupPage = async (req, res) => {
+    res.sendFile('signup.html', { root: 'views' });
+}
+
 exports.login = async (request, response) => {
     try {
         const { email, password } = request.body;
-        let userExist = await User.findOne({ where: { email_Id: email } })
+        let userExist = await User.findOne({ where: { emailId: email } })
         if (userExist) {
             const isPasswordValid = await bcrypt.compare(password, userExist.password);
-            console.log(isPasswordValid);
+            // console.log(isPasswordValid);
             if (isPasswordValid) {
                 const token = jwt.sign({ userId: userExist.id, name: userExist.name }, process.env.SECRET_KEY);
                 // DB.online_arr.push(userExist.name);
@@ -119,21 +123,22 @@ exports.getAllUserExcept = async (req, res) => {
 exports.createGroup = async (request, response, next) => {
     try {
         const user = request.user;
-        const { name, description, membersNo, membersIds, dp_url } = request.body;
+        let { name, description, membersNo, membersIds, dp_url } = request.body;
+        if(!dp_url){
+            dp_url = "https://groupchat-application.s3.amazonaws.com/people.png";
+        }
         const group = await user.createGroup({
-            name,
-            membersNo,
-            dp_url,
-            description,
-            AdminId: user.id
-        })
+            name: name,
+            membersNo: membersNo,
+            dpUrl: dp_url,
+            description: description,
+            adminId: user.id
+        })        
         membersIds.push(user.id);
         await group.addUsers(membersIds.map((ele) => {
             return Number(ele)
         }));
-        console.log(group.id);
-        return response.status(200).json({ group, message: "Group is succesfylly created" })
-
+        return response.status(200).json({ group, message: "Group is succesfylly created" });
     } catch (error) {
         console.log(error);
         return response.status(500).json({ message: 'Internal Server error!' })
@@ -146,7 +151,7 @@ exports.updateGroup = async (request, response, next) => {
         const group = await Group.findOne({ where: { id: groupId } })
         await group.update({
             name: name,
-            dp_url: dp_url,
+            dpUrl: dp_url,
             description: description,
         })
         return response.status(200).json({ group, message: "Group is succesfylly created" })
@@ -174,6 +179,7 @@ exports.deleteGroup = async (req, res) => {
 
 exports.addUser = async (request, response, next) => {
     try {
+        console.log("yaha tak toh kaam krraaa..............................................................................................................................................................................");
         const { groupId } = request.query;
         const { usersToAddIds } = request.body;
         const group = await Group.findOne({ where: { id: Number(groupId) } });
@@ -223,7 +229,9 @@ exports.getGroupbyId = async (request, response, next) => {
 exports.getMygroups = async (request, response, next) => {
     try {
         const user = request.user;
+        // console.log(user);
         const groups = await user.getGroups();
+        // console.log(groups);
         return response.status(200).json({ groups, message: "All groups succesfully fetched" })
 
     } catch (error) {
@@ -245,6 +253,7 @@ exports.getGroupMembersbyId = async (request, response, next) => {
                 }
             }
         });
+        // console.log(AllusersData);
         const users = AllusersData.map((ele) => {
             return {
                 id: ele.id,
@@ -255,7 +264,7 @@ exports.getGroupMembersbyId = async (request, response, next) => {
             return ele.id;
         })
 
-        response.status(200).json({ users, userIds, message: "Group members name succesfully fetched" })
+        response.status(200).json({ users, userIds,message: "Group members name succesfully fetched" })
     } catch (error) {
         console.log(error);
         return response.status(500).json({ message: 'Internal Server error!' })
@@ -274,10 +283,10 @@ exports.getGroupChatHistory = async (request, response, next) => {
             include: [
                 {
                     model: User,
-                    attibutes: ['id', 'name', 'date_time']
+                    // attibutes: ['id', 'name', 'date_time']
                 }
             ],
-            order: [['date_time', 'ASC']],
+            order: [['createdAt', 'ASC']],
             where: {
                 GroupId: Number(groupId),
             }
@@ -301,12 +310,12 @@ exports.getGroupChatHistory = async (request, response, next) => {
                 // console.log(user);
                 return {
                     messageId: ele.id,
-                    message: ele.message,
-                    isImage: ele.isImage,
-                    isVideo: ele.isVideo,
                     name: user.name,
+                    text: ele.text,
+                    fileType: ele.fileType,
+                    fileUrl: ele.fileUrl,
                     userId: user.id,
-                    date_time: ele.date_time
+                    createdAt: ele.createdAt
                 };
             } catch (error) {
                 console.error('Error fetching user:', error);

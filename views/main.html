@@ -18,11 +18,13 @@
             <h4>Create new group</h4>
             <hr>
             <div class="profile_container">
-                <img id="preview1" src="">
+                <img id="preview1" src="/img/people.png">
             </div>
+            <!-- <div class="profile_container">
+                <img id="preview2" src="">
+            </div> -->
             <div class="avatar-upload">
-                <input type="file" class="avatar" id="id" name="profile" accept="image/*"
-                    onchange="previewImage1(event)">
+                <input type="file" class="avatar" id="id" name="profile" accept="image/*" onchange="previewImage1(event)">
                 <label for="id" class="fa-solid fa-user-pen"></label>
             </div>
             <div class="bundle">
@@ -56,7 +58,9 @@
                 <img src="" alt="Expanded Image">
             </div>
             <div id="group_header">
-                <img src="https://picsum.photos/seed/common/200" alt="Profile Picture" id="group_img">
+                <!-- <img src="https://picsum.photos/seed/common/200" alt="Profile Picture" id="group_img"> -->
+                <!-- <img src="/img/group-team.PNG" alt="Profile Picture" id="group_img"> -->
+                <img src="/img/people.png" alt="Profile Picture" id="group_img">
                 <h3><strong class="mb-1" id="group_heading">Demo Group Chatbox</strong></h3>
                 <div>
                     <small id="group_members"
@@ -82,7 +86,7 @@
                                     <b id="VGP_groupname">Group groupName</b>
                             </div>
                             <div class="VGP-bundle">
-                                    <small id="VGP_description">Group Description</small>
+                                    <p id="VGP_description">Group Description</p>
                             </div>
                         </form> 
                         <form id="group_profile_edit_Form">
@@ -108,7 +112,7 @@
                                     <textarea name="edit_description" id="edit_description" cols="30" rows="2"></textarea required>
                             </div>
                             <div id="GPEbtn_div">
-                                <button id="update_cancel_btn" class="cancel_btn" onclick="closeForm('group_profile_edit_Form')">Cancel</button>
+                                <button id="update_cancel_btn" class="cancel_btn" type="button" onclick="closeForm('group_profile_edit_Form')">Cancel</button>
                                 <button id="update_profile" type="submit">Update Profile</button>
                             </div>
                         </form> 

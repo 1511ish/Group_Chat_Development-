@@ -5,7 +5,7 @@ const email = document.getElementById('login_email');
 const password = document.getElementById('login_password');
 signup_btn.addEventListener('click', (e) => {
     e.preventDefault();
-    window.location.href = "../home";
+    window.location.href = "/signup";
 })
 login_btn.addEventListener('click', login);
 
@@ -21,10 +21,8 @@ async function login(e) {
             login_form.reset();
             localStorage.setItem("token",Response.data.token);
             window.alert(Response.data.message);
-            window.location.href = '/user/main';
+            window.location.href = '/';
         }
-
-
     } catch (error) {
         if (error.response && error.response.status === 401) {
             alert(error.response.data.message);
@@ -37,4 +35,23 @@ async function login(e) {
         login_form.reset();
 
     }
+}
+
+const forgot_password = document.getElementById("forgot_password");
+forgot_password.addEventListener('click', resetPassword);
+
+async function resetPassword(e) {
+    e.preventDefault();
+    const email = document.getElementById('login_email');
+    
+    if (email.value) {
+        const emailObj = {
+            email: email.value
+        }
+        const response = await axios.post('/password/forgot-password', emailObj);
+        alert(`${response.data.message}`);
+    } else {
+        window.alert("please fill Email first before press reset password!");
+    }
+    email.value = '';
 }

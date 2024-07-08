@@ -1,7 +1,8 @@
 var form = document.getElementById("signupForm");
 const signUpButton = document.getElementById('signUp');
-signUpButton.addEventListener("click", signup);
+const AHAButton = document.getElementById('AHA');
 
+signUpButton.addEventListener('click',signup);
 async function signup(e) {
     e.preventDefault();
 
@@ -22,13 +23,13 @@ async function signup(e) {
             phone_no: phone_no.value,
             password: password.value
         }
-        console.log('chal toh raha bhai..');
-        const response = await axios.post('user/signup', user);
+        const response = await axios.post('/user/signup', user);
         alert("user signup successfully.");
-        window.location.href = "user/loginPage";
+        window.location.href = "/login";
     } catch (err) {
         form_container.innerHTML += `<div style='color:red ;margin:5px'>${err.response.data.message} <div>`;
     }
 
     form.reset();
 }
+
