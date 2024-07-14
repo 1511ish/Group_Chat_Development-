@@ -31,7 +31,6 @@ ShowGroup();
 create_newgroup_btn.addEventListener('click', create_newgroup)
 
 function afterSetUp(groupId) {
-    console.log("in afterSetUp method.");
     let html = `<ul>
                    <li><a href="#" class="" onclick='viewGroupProfile(${groupId})'>View Group Profile</a></li>
                    <li><a href="#" class="option_editProfile" onclick='groupProfileEditform(${groupId})'>Edit Group Profile</a></li>
@@ -334,9 +333,11 @@ async function viewGroupProfile2() {
 }
 
 async function viewGroupProfile(groupId) {
+    // event.stopPropagation();
     view_groupProfile_form.style.visibility = 'visible';
     const APIresponse = await axios(`/group/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
+    console.log(group);
     if (group.dpUrl)
         preview2.src = group.dpUrl;
     else
@@ -461,7 +462,7 @@ async function create_newgroup(e) {
             }
             axios.post(`/group/create-group`, data, { headers: { 'Authorization': getToken() } })
                 .then(res => {
-                    alert("Group successfully created");
+                    alert("Group successfully created(bina profile ka)");
                     //create from shouild be disappear
                     groupForm.style.visibility = 'hidden';
                     //group list mein new group should be seen
@@ -497,17 +498,18 @@ async function ShowGroup() {
         const groupsResponse = await axios(`/group/get-mygroups`, { headers: { 'Authorization': getToken() } });
         const { groups } = groupsResponse.data;
         let html = "";
+        let src = ''
         groups.forEach((ele) => {
             if (ele.dpUrl) {
                 src = `${ele.dpUrl}`;
             } else {
-                src = `https://groupchat-application.s3.ap-south-1.amazonaws.com/groupProfile.svg`;
-                // src = `<i class="fa-solid fa-user-group"></i>`;
+                src = `/img/people.png`;
+
             }
             html += `               
             <li onclick="showGroupChat(${ele.id})" id = "${'group'+ele.id}">
                <div>
-                   <img src="${src}" alt="Profile Picture" onclick='viewGroupProfile(${ele.id})'>
+                   <img src="${src}" alt="Profile Picture" onclick="viewGroupProfile('event',${ele.id})">
                    <strong>${ele.name}</strong>
                    <small id ="${'small'+ele.id}">${ele.membersNo} Members <small id="${ele.id}" class="incoming_msgCount" style="visibility: hidden;">0</small></small>
                </div>
@@ -949,4 +951,16 @@ function expandImage(src) {
 function closeExpandedImage() {
     var expandedImage = document.getElementById('expanded-image');
     expandedImage.style.display = 'none';
+}
+
+
+
+
+var gContainer = document.getElementById("group_related_container");
+
+function showMenu(){
+    gContainer.style.left = "0px";
+}
+function hideMenu(){
+    gContainer.style.left = "-350px";
 }
