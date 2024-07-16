@@ -23,6 +23,8 @@ const fileInput = document.querySelector('input[name="media"]');
 const preview = document.getElementById('preview');
 const messageInput = document.querySelector('input[name="message"]');
 
+var flag = false;
+
 var groupId;
 var src;
 getToken();
@@ -43,8 +45,9 @@ function afterSetUp(groupId) {
     dots.addEventListener("click", displayMenu);
 
     document.addEventListener("click", function (event) {
+        console.log("it is working..");
         if (!event.target.closest('.options')) {
-            optionsMenu.style.display = "none";
+            optionsMenu.style.display = "none";  
         }
     });
 }
@@ -332,7 +335,7 @@ async function viewGroupProfile2() {
     VGP_description.innerHTML = ` ${group.description}`;
 }
 
-async function viewGroupProfile(event,groupId) {
+async function viewGroupProfile(groupId) {
     // event.stopPropagation();
     view_groupProfile_form.style.visibility = 'visible';
     const APIresponse = await axios(`/group/get-group?groupId=${groupId}`);
@@ -532,6 +535,8 @@ async function showGroupChat(id) {
             const APIresponse = await axios(`/group/get-group-messages?groupId=${groupId}`);
             const apiChats = APIresponse.data.chats
             showChatOnScreen(apiChats, userId)
+            if(flag)
+               hideMenu();
         } else {
             console.log("no group id");
         }
@@ -574,33 +579,33 @@ function showChatOnScreen(chatHistory, userId) {
                                     </div>`;
                 }
             }
-            else if (ele.fileType == 'video') {
-                if (ele.text) {
-                    messageText += `                            
-                                    <div class="card outgoing">
-                                       <small class="text-primary">${ele.name}</small>  
-                                       <video controls style="max-width: 300px; max-height: 300px;"><source src="${ele.fileUrl}"></video>;  
-                                       <p>${ele.text}</p>                     
-                                       <small class="text-muted text-end">${formattedDate}</small>
-                                    </div>`
-                }
-                else {
-                    messageText += `                            
-                                   <div class="card outgoing">
-                                      <small class="text-primary">${ele.name}</small>  
-                                      <video controls style="max-width: 300px; max-height: 300px;"><source src="${ele.fileUrl}"></video>;                    
-                                      <small class="text-muted text-end">${formattedDate}</small>
-                                  </div>`
-                }
-            }
-            else {
-                messageText += `                            
-                <div class="card outgoing">
-                   <small class="text-primary">${ele.name}</small>
-                   <p class="chat">${ele.text}</p> 
-                   <small class="text-muted text-end">${formattedDate}</small>
-               </div>`
-            }
+            // else if (ele.fileType == 'video') {
+            //     if (ele.text) {
+            //         messageText += `                            
+            //                         <div class="card outgoing">
+            //                            <small class="text-primary">${ele.name}</small>  
+            //                            <video controls class='chat-video'><source src="${ele.fileUrl}"></video>;  
+            //                            <p>${ele.text}</p>                     
+            //                            <small class="text-muted text-end">${formattedDate}</small>
+            //                         </div>`
+            //     }
+            //     else {
+            //         messageText += `                            
+            //                        <div class="card outgoing">
+            //                           <small class="text-primary">${ele.name}</small>  
+            //                           <video controls class='chat-video'><source src="${ele.fileUrl}"></video>;                    
+            //                           <small class="text-muted text-end">${formattedDate}</small>
+            //                       </div>`
+            //     }
+            // }
+            // else {
+            //     messageText += `                            
+            //     <div class="card outgoing">
+            //        <small class="text-primary">${ele.name}</small>
+            //        <p class="chat">${ele.text}</p> 
+            //        <small class="text-muted text-end">${formattedDate}</small>
+            //    </div>`
+            // }
         } else {
             if (ele.fileType == 'image') {
                 if (ele.text) {
@@ -952,3 +957,19 @@ function closeExpandedImage() {
     var expandedImage = document.getElementById('expanded-image');
     expandedImage.style.display = 'none';
 }
+
+
+
+
+var gContainer = document.getElementById("group_related_container");
+
+function showMenu(){
+    gContainer.style.left = "0px";
+    flag = true;
+}
+
+function hideMenu(){
+    gContainer.style.left = "-350px";
+    flag = false;
+}
+

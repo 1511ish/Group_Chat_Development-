@@ -21,7 +21,7 @@ body h1 {
 
 #group_related_container {
     background: #25d366;
-    padding: 15px;
+    padding: 0px 15px;
     flex: 3;
 }
 
@@ -104,7 +104,7 @@ body h1 {
     background-color: #e5e5ea;
     padding: 10px;
     border-radius: 10px;
-    max-width: 70%;
+    /* max-width: 70%; */
 }
 
 .outgoing {
@@ -112,8 +112,14 @@ body h1 {
     background-color: #dcf8c6;
     padding: 10px;
     border-radius: 10px;
-    max-width: 70%;
+    /* max-width: 70%; */
 }
+@media (max-width: 400px){
+    .outgoing, .incoming{
+        padding: 5px;
+    }
+}
+
 
 .text-muted {
     color: grey;
@@ -192,7 +198,7 @@ ul li {
     padding: 10px;
     width: 30%;
     text-align: center;
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     border-radius: 10px;
     visibility: hidden;
@@ -603,6 +609,21 @@ textarea {
 
 }
 
+@media (max-width: 768px){
+    #preview{
+        left: 22%;
+        max-width: 350px !important;
+        bottom: 40px;
+    }
+}
+@media (max-width: 400px){
+    #preview{
+        left: 15%;
+        max-width: 250px !important;
+        bottom: 25px;
+    }
+}
+
 #message_form div {
     width: 80%;
 }
@@ -639,9 +660,25 @@ textarea {
 }
 
 .chat-image {
-    /* max-height: 300px; */
-    max-height: 500px;
-    max-width: 400px;
+    max-width: 350px;
+}
+.chat-video{
+    max-width: 350px;
+}
+@media (max-width: 768px){
+    .chat-image{
+        max-width: 250px;
+    }
+}
+@media (max-width: 500px){
+    .chat-image{
+        max-width: 150px;
+    }
+}
+@media (max-width: 500px){
+    .chat-video{
+        max-width: 200px;
+    }
 }
 
 .VGP-bundle {
@@ -691,15 +728,17 @@ textarea {
 
 
 /* Responiseness */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     #container {
-        font-size: x-small;
+        /* font-size: x-small; */
+        font-size: small;
     }
     #create_newgroup_btn{
         font-size: small;
     }
     #group_header img{
-        width: 35px;
+        width: 40px;
+        height: 40px;
     }
     #three_dotes{
         padding: 5px 10px;
@@ -708,8 +747,8 @@ textarea {
         padding: 10px;
     }
     #group_container li div img{
-        width: 35px;
-        height:35px;
+        height: 40px;
+        width: 40px;
     }
     #group_bottom{
         padding: 5px;
@@ -724,6 +763,53 @@ textarea {
     .cancel_btn,button[type="submit"]{
         font-size: xx-small;
         padding: 5px 10px;
-        overflow: hidden;
     }
+
+    #group_related_container {
+        background: #25d366;
+        /* background: red; */
+        padding: 15px;
+        position: fixed;
+        height: 100vh;
+        width: 350px;
+        top: 0px;
+        left: -350px;
+        text-align: left;
+        z-index: 2;
+        transition: 1s;
+    }
+
+    .back_icon{
+        display: block !important;
+    }
+
+    #back{
+        color: #fff;
+        background-color: black;
+        padding: 8px;
+        border-radius: 10px;
+        width: 100%;
+        margin-bottom: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* display: block !important; */
+        visibility: visible !important;
+    }
+}
+
+
+#img_div{
+    display: flex;
+    align-items: center;
+}
+
+.back_icon{
+    height: 20px !important;
+    width: auto !important;
+    border: none !important;
+    display: none;
+}
+#back{
+    visibility: hidden;
 }
