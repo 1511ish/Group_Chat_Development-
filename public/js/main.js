@@ -26,7 +26,7 @@ const messageInput = document.querySelector('input[name="message"]');
 var flag = false;
 
 var groupId;
-var src;
+const src = './img/people.png';
 getToken();
 ShowGroup();
 
@@ -336,7 +336,7 @@ async function viewGroupProfile2() {
 }
 
 async function viewGroupProfile(groupId) {
-    // event.stopPropagation();
+    
     view_groupProfile_form.style.visibility = 'visible';
     const APIresponse = await axios(`/group/get-group?groupId=${groupId}`);
     const { group } = APIresponse.data;
@@ -512,7 +512,7 @@ async function ShowGroup() {
             html += `               
             <li onclick="showGroupChat(${ele.id})" id = "${'group'+ele.id}">
                <div>
-                   <img src="${src}" alt="Profile Picture" onclick="viewGroupProfile('event',${ele.id})">
+                   <img src="${src}" alt="Profile Picture" onclick="event.stopPropagation(); viewGroupProfile(${ele.id})">
                    <strong>${ele.name}</strong>
                    <small id ="${'small'+ele.id}">${ele.membersNo} Members <small id="${ele.id}" class="incoming_msgCount" style="visibility: hidden;">0</small></small>
                </div>
@@ -696,10 +696,7 @@ async function setupGroup(groupId, userId) {
 
         const usersString = users.map(item => item.name.trim()).join(',');
         group_members.setAttribute("title", `You,${usersString}`);
-        // yaha pe issue hai bro...
         send_btn.id = groupId
-        // console.log("bhar toh working hai..")
-        // console.log(group);
         if (group.adminId == userId) {
             // console.log("but ander issue hai..")
             group_editbtn.classList.remove('d-none')
